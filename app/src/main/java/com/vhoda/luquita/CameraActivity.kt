@@ -2,7 +2,7 @@ package com.vhoda.luquita
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Color
+import android.graphics.*
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,7 +20,14 @@ import com.vhoda.luquita.databinding.ActivityCameraBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import android.content.Intent
-
+import android.graphics.RectF
+import android.media.Image
+import androidx.camera.core.Camera
+import androidx.camera.view.PreviewView
+import java.io.ByteArrayOutputStream
+import android.graphics.YuvImage
+import android.graphics.ImageFormat
+import kotlin.math.roundToInt
 
 class CameraActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCameraBinding
@@ -32,15 +39,18 @@ class CameraActivity : AppCompatActivity() {
     private var lastProcessedText = ""
     private var lastProcessTime = 0L
 
-    private val CAMERA_PERMISSION_REQUEST_CODE = 1001
-    private val PROCESS_INTERVAL = 1000L // Intervalo mayor entre procesamiento de frames para evitar múltiples detecciones
+    private lateinit var scanRegion: RectF
+    private var previewWidth: Int = 0
+    private var previewHeight: Int = 0
 
-    private var isTextDetected = false // Bandera para limitar a un solo resultado
+    private val CAMERA_PERMISSION_REQUEST_CODE = 1001
+    private val PROCESS_INTERVAL = 1000L
+
+    private var isTextDetected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Configuración de pantalla completa
         window.setFlags(
             LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             LayoutParams.FLAG_LAYOUT_NO_LIMITS
@@ -56,24 +66,37 @@ class CameraActivity : AppCompatActivity() {
         binding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializar el executor para la cámara
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        binding.cameraPreview.post {
+            initializeScanRegion()
+        }
 
         setupUI()
         checkCameraPermission()
+    }
+
+    private fun initializeScanRegion() {
+        previewWidth = binding.cameraPreview.width
+        previewHeight = binding.cameraPreview.height
+
+        val scanFrame = binding.scanFrameContainer
+        val scanFrameLocation = IntArray(2)
+        scanFrame.getLocationInWindow(scanFrameLocation)
+
+        scanRegion = RectF(
+            scanFrameLocation[0].toFloat() / previewWidth,
+            scanFrameLocation[1].toFloat() / previewHeight,
+            (scanFrameLocation[0] + scanFrame.width).toFloat() / previewWidth,
+            (scanFrameLocation[1] + scanFrame.height).toFloat() / previewHeight
+        )
     }
 
     private fun setupUI() {
         binding.apply {
             btnFlash.setOnClickListener { toggleFlash() }
             btnCancel.setOnClickListener { finish() }
-
-            // Configurar el TextView para el texto reconocido
-            recognizedTextView.apply {
-                setBackgroundResource(R.drawable.text_background) // Asegúrate de crear este drawable
-                setPadding(16, 8, 16, 8)
-                visibility = View.INVISIBLE
-            }
+            recognizedTextView.visibility = View.GONE
         }
     }
 
@@ -100,7 +123,6 @@ class CameraActivity : AppCompatActivity() {
                 val cameraProvider = cameraProviderFuture.get()
                 cameraProvider.unbindAll()
 
-                // Configurar la vista previa
                 val preview = Preview.Builder()
                     .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                     .build()
@@ -108,12 +130,10 @@ class CameraActivity : AppCompatActivity() {
                         it.setSurfaceProvider(binding.cameraPreview.surfaceProvider)
                     }
 
-                // Configurar el selector de cámara
                 val cameraSelector = CameraSelector.Builder()
                     .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                     .build()
 
-                // Configurar el análisis de imagen
                 val imageAnalyzer = ImageAnalysis.Builder()
                     .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -124,7 +144,6 @@ class CameraActivity : AppCompatActivity() {
                         }
                     }
 
-                // Vincular casos de uso
                 camera = cameraProvider.bindToLifecycle(
                     this,
                     cameraSelector,
@@ -132,7 +151,6 @@ class CameraActivity : AppCompatActivity() {
                     imageAnalyzer
                 )
 
-                // Observar el estado del flash
                 camera?.cameraInfo?.torchState?.observe(this) { torchState ->
                     isFlashOn = torchState == TorchState.ON
                     updateFlashIcon()
@@ -158,35 +176,115 @@ class CameraActivity : AppCompatActivity() {
         isProcessingImage = true
         lastProcessTime = System.currentTimeMillis()
 
-        val mediaImage = imageProxy.image
-        if (mediaImage != null) {
-            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+        try {
+            val bitmap = imageProxy.toBitmap()
+            if (bitmap != null) {
+                val croppedBitmap = cropBitmap(bitmap, imageProxy.imageInfo.rotationDegrees)
+                if (croppedBitmap != null) {
+                    val image = InputImage.fromBitmap(croppedBitmap, 0)
 
-            recognizer.process(image)
-                .addOnSuccessListener { visionText ->
-                    val detectedText = visionText.text.trim()
-                    if (detectedText.isNotEmpty() && detectedText != lastProcessedText) {
-                        lastProcessedText = detectedText
-                        if (!isTextDetected) { // Solo enviar el primer texto detectado
-                            isTextDetected = true
-                            // Aquí redirigimos a ResultActivity con el texto detectado
-                            val intent = Intent(this@CameraActivity, ResultActivity::class.java)
-                            intent.putExtra(ResultActivity.EXTRA_DETECTED_TEXT, detectedText)
-                            startActivity(intent)
-                            finish()  // Finaliza la actividad de la cámara para no seguir procesando
+                    recognizer.process(image)
+                        .addOnSuccessListener { visionText ->
+                            val detectedText = visionText.text.trim()
+                            if (detectedText.isNotEmpty() && detectedText != lastProcessedText) {
+                                lastProcessedText = detectedText
+                                if (!isTextDetected) {
+                                    isTextDetected = true
+                                    runOnUiThread {
+                                        binding.goToResultButton.visibility = View.VISIBLE
+                                    }
+                                    val intent = Intent(this@CameraActivity, ResultActivity::class.java)
+                                    intent.putExtra(ResultActivity.EXTRA_DETECTED_TEXT, detectedText)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                            }
                         }
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.e(TAG, "Error al procesar texto: ${e.message}")
-                }
-                .addOnCompleteListener {
+                        .addOnFailureListener { e ->
+                            Log.e(TAG, "Error al procesar texto: ${e.message}")
+                        }
+                        .addOnCompleteListener {
+                            croppedBitmap.recycle()
+                            bitmap.recycle()
+                            imageProxy.close()
+                            isProcessingImage = false
+                        }
+                } else {
+                    bitmap.recycle()
                     imageProxy.close()
                     isProcessingImage = false
                 }
-        } else {
+            } else {
+                imageProxy.close()
+                isProcessingImage = false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error en processImageForOCR: ${e.message}")
             imageProxy.close()
             isProcessingImage = false
+        }
+    }
+
+    private fun ImageProxy.toBitmap(): Bitmap? {
+        val yBuffer = planes[0].buffer
+        val uBuffer = planes[1].buffer
+        val vBuffer = planes[2].buffer
+
+        val ySize = yBuffer.remaining()
+        val uSize = uBuffer.remaining()
+        val vSize = vBuffer.remaining()
+
+        val nv21 = ByteArray(ySize + uSize + vSize)
+
+        yBuffer.get(nv21, 0, ySize)
+        vBuffer.get(nv21, ySize, vSize)
+        uBuffer.get(nv21, ySize + vSize, uSize)
+
+        val yuvImage = YuvImage(nv21, ImageFormat.NV21, width, height, null)
+        val out = ByteArrayOutputStream()
+        yuvImage.compressToJpeg(Rect(0, 0, width, height), 100, out)
+        val imageBytes = out.toByteArray()
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    }
+
+    private fun cropBitmap(bitmap: Bitmap, rotation: Int): Bitmap? {
+        return try {
+            // Ajustar las coordenadas según la rotación
+            val (cropX, cropY, cropWidth, cropHeight) = when (rotation) {
+                90, 270 -> {
+                    val x = (scanRegion.top * bitmap.width).roundToInt()
+                    val y = (scanRegion.left * bitmap.height).roundToInt()
+                    val width = ((scanRegion.bottom - scanRegion.top) * bitmap.width).roundToInt()
+                    val height = ((scanRegion.right - scanRegion.left) * bitmap.height).roundToInt()
+                    listOf(x, y, width, height)
+                }
+                else -> {
+                    val x = (scanRegion.left * bitmap.width).roundToInt()
+                    val y = (scanRegion.top * bitmap.height).roundToInt()
+                    val width = ((scanRegion.right - scanRegion.left) * bitmap.width).roundToInt()
+                    val height = ((scanRegion.bottom - scanRegion.top) * bitmap.height).roundToInt()
+                    listOf(x, y, width, height)
+                }
+            }
+
+            // Validar coordenadas
+            if (cropX < 0 || cropY < 0 || cropWidth <= 0 || cropHeight <= 0 ||
+                cropX + cropWidth > bitmap.width || cropY + cropHeight > bitmap.height) {
+                Log.e(TAG, "Coordenadas de recorte inválidas")
+                return null
+            }
+
+            // Crear el bitmap recortado
+            Bitmap.createBitmap(
+                bitmap,
+                cropX,
+                cropY,
+                cropWidth,
+                cropHeight
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al recortar bitmap: ${e.message}")
+            null
         }
     }
 
