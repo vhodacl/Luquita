@@ -9,6 +9,17 @@
     android:transitionName="camera_button"
     tools:context=".CameraActivity">
 
+    <TextView
+        android:id="@+id/recognizedTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Texto reconocido"
+        android:textSize="18sp"
+        android:visibility="gone"
+        android:layout_margin="16dp"/>
+
+
+
     <!-- Vista previa de la cámara -->
     <androidx.camera.view.PreviewView
         android:id="@+id/camera_preview"
@@ -17,6 +28,51 @@
         android:background="@android:color/transparent"
         app:implementationMode="performance" />
 
+    <!-- Esquinas del marco de escaneo -->
+    <!-- Frame Container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/scan_frame_container"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <View
+            android:id="@+id/corner_top_left"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/corner_top_left"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <View
+            android:id="@+id/corner_top_right"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/corner_top_right"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <View
+            android:id="@+id/corner_bottom_left"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/corner_bottom_left"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <View
+            android:id="@+id/corner_bottom_right"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/corner_bottom_right"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <!-- Contenedor de botones -->
     <LinearLayout
         android:id="@+id/buttons_layout"
@@ -24,11 +80,20 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="56dp"
+        android:paddingVertical="96dp"
         android:gravity="center"
         android:weightSum="1"
         app:layout_constraintBottom_toBottomOf="parent">
-
+        <!-- Botón para ir a ResultActivity -->
+        <Button
+            android:id="@+id/goToResultButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ver Resultado"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/resultMessageText"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
         <!-- Contenedor izquierdo -->
         <FrameLayout
             android:layout_width="0dp"
@@ -38,8 +103,8 @@
             <!-- Botón para la linterna con MaterialCardView -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btn_flash"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_gravity="center"
                 app:cardCornerRadius="40dp"
                 app:cardElevation="0dp"
@@ -65,7 +130,7 @@
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.2" />
+            android:layout_weight="0.3" />
 
         <!-- Contenedor derecho -->
         <FrameLayout
@@ -76,8 +141,8 @@
             <!-- Botón para cerrar con MaterialCardView -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btn_cancel"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_gravity="center"
                 app:cardCornerRadius="40dp"
                 app:cardElevation="0dp"
