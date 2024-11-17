@@ -8,30 +8,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
 import android.content.Context
-import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.view.ViewCompat
-import com.google.android.material.transition.platform.MaterialContainerTransform
 
 class MainActivity : AppCompatActivity() {
     private val PICK_IMAGE = 101
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Configurar la transición de entrada
-        window.sharedElementEnterTransition = MaterialContainerTransform().apply {
-            addTarget(android.R.id.content)
-            duration = 300L // Duración de la animación en milisegundos
-        }
-
-        // Configurar la transición de retorno
-        window.sharedElementReturnTransition = MaterialContainerTransform().apply {
-            addTarget(android.R.id.content)
-            duration = 250L
-        }
-
-        // Establecer el callback para elementos compartidos
-        setEnterSharedElementCallback(MaterialContainerTransformSharedElementCallback())
-
         super.onCreate(savedInstanceState)
 
         // Verificar si completó el onboarding y tiene permisos
@@ -40,34 +21,30 @@ class MainActivity : AppCompatActivity() {
         val completedOnboarding = prefs.getBoolean("ONBOARDING_COMPLETED", false)
 
         if (!hasPermissions || !completedOnboarding) {
+            // Si no tiene permisos o no completó el onboarding, mostrar WelcomeActivity
             startActivity(Intent(this, WelcomeActivity::class.java))
             finish()
             return
         }
 
+        // Si ya tiene permisos, mostrar contenido principal
         setContentView(R.layout.activity_main)
 
+        // Configurar el Toolbar
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        val cameraButton = findViewById<MaterialCardView>(R.id.camera)
-        // Asignar un transition name único al botón de la cámara
-        ViewCompat.setTransitionName(cameraButton, "camera_button")
-
+        // Vincula los botones de la interfaz
         findViewById<MaterialCardView>(R.id.gallery).setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             startActivityForResult(intent, PICK_IMAGE)
         }
 
-        cameraButton.setOnClickListener {
+        findViewById<MaterialCardView>(R.id.camera).setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
-            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                this,
-                cameraButton,
-                ViewCompat.getTransitionName(cameraButton)!!
-            )
-            startActivity(intent, options.toBundle())
+            startActivity(intent)
         }
+
     }
 
     @Deprecated("Deprecated in Java")

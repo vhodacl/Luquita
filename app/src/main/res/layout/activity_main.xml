@@ -76,7 +76,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/gallery"
                 android:layout_width="0dp"
-                android:layout_height="77dp"
+                android:layout_height="75dp"
                 android:layout_weight="1"
                 android:layout_margin="3dp"
                 app:cardCornerRadius="18dp"
@@ -103,10 +103,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
+                        android:layout_marginTop="0dp"
                         android:text="Galería"
                         android:textColor="@color/md_theme_brownie"
-                        android:textSize="14sp" />
+                        android:textSize="13sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -114,7 +114,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/camera"
                 android:layout_width="0dp"
-                android:layout_height="77dp"
+                android:layout_height="75dp"
                 android:layout_weight="1"
                 android:layout_margin="3dp"
                 app:cardCornerRadius="18dp"
@@ -141,10 +141,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
+                        android:layout_marginTop="0dp"
                         android:text="Cámara"
                         android:textColor="@color/md_theme_brownie"
-                        android:textSize="14sp" />
+                        android:textSize="13sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

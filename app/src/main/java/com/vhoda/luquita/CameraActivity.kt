@@ -16,8 +16,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.vhoda.luquita.databinding.ActivityCameraBinding
-import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
-import com.google.android.material.transition.platform.MaterialContainerTransform
 
 class CameraActivity : AppCompatActivity() {
 
@@ -29,22 +27,7 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        window.sharedElementEnterTransition = MaterialContainerTransform().apply {
-            addTarget(android.R.id.content)
-            duration = 300L
-            scrimColor = Color.TRANSPARENT // Color del fondo durante la transición
-            setAllContainerColors(resources.getColor(R.color.md_theme_tertiary, theme)) // Color del contenedor
-        }
-
-        // Establecer el callback para elementos compartidos
-        setEnterSharedElementCallback(MaterialContainerTransformSharedElementCallback())
-
-        // Hacer que la ventana dibuje su contenido detrás de la barra de estado
-        window.setDecorFitsSystemWindows(false)
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_camera)
-
 
         // Usando LayoutParams en lugar de WindowManager
         window.setFlags(
