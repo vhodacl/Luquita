@@ -20,6 +20,7 @@ android {
 
     defaultConfig {
         applicationId "com.vhoda.luquita"
+        minSdkVersion 23
         minSdk 21
         targetSdk 35  // Cambiado de 35 a 34
         versionCode 1
@@ -61,6 +62,11 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:${camerax_version}"
     implementation "androidx.camera:camera-view:${camerax_version}"
     implementation "androidx.camera:camera-extensions:${camerax_version}"
+
+    implementation "androidx.camera:camera-core:1.1.0"
+    implementation "androidx.camera:camera-camera2:1.1.0"
+    implementation "androidx.camera:camera-lifecycle:1.1.0"
+    implementation "androidx.camera:camera-view:1.0.0"
 
     // Activity y Fragment KTX - versiones actualizadas y unificadas
     def activity_version = "1.8.2"

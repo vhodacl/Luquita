@@ -41,8 +41,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<MaterialCardView>(R.id.camera).setOnClickListener {
-            Toast.makeText(this, "Función de cámara no implementada aún", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
         }
+
     }
 
     @Deprecated("Deprecated in Java")
