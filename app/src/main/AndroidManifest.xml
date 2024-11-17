@@ -14,16 +14,6 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <!-- Actividad de bienvenida (WelcomeActivity) -->
-        <activity
-            android:name=".WelcomeActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
         <!-- Actividad principal (MainActivity) -->
         <activity
             android:name=".MainActivity"
@@ -31,6 +21,17 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme"
             android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Actividad de bienvenida (WelcomeActivity) -->
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
     </application>
 </manifest>
