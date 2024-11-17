@@ -2,7 +2,10 @@ package com.vhoda.luquita
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
+import android.view.WindowManager.LayoutParams
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
@@ -13,8 +16,11 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.vhoda.luquita.databinding.ActivityCameraBinding
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
+import com.google.android.material.transition.platform.MaterialContainerTransform
 
 class CameraActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityCameraBinding
     private var camera: Camera? = null
     private var isFlashOn = false
@@ -22,7 +28,37 @@ class CameraActivity : AppCompatActivity() {
     private val CAMERA_PERMISSION_REQUEST_CODE = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        window.sharedElementEnterTransition = MaterialContainerTransform().apply {
+            addTarget(android.R.id.content)
+            duration = 300L
+            scrimColor = Color.TRANSPARENT // Color del fondo durante la transición
+            setAllContainerColors(resources.getColor(R.color.md_theme_tertiary, theme)) // Color del contenedor
+        }
+
+        // Establecer el callback para elementos compartidos
+        setEnterSharedElementCallback(MaterialContainerTransformSharedElementCallback())
+
+        // Hacer que la ventana dibuje su contenido detrás de la barra de estado
+        window.setDecorFitsSystemWindows(false)
+
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_camera)
+
+
+        // Usando LayoutParams en lugar de WindowManager
+        window.setFlags(
+            LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
+
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
+
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+
         binding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -32,12 +68,10 @@ class CameraActivity : AppCompatActivity() {
             startCamera()
         }
 
-        // Configurar el botón de flash
         binding.btnFlash.setOnClickListener {
             toggleFlash()
         }
 
-        // Configurar el botón de cerrar
         binding.btnCancel.setOnClickListener {
             finish()
         }
