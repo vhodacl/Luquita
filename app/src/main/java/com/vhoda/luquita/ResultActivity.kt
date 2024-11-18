@@ -143,12 +143,12 @@ class ResultActivity : AppCompatActivity() {
                 }
         } catch (e: Exception) {
             mapOf(
-                "Nombre" to "No disponible",
-                "RUT" to "No disponible",
-                "Banco" to "No disponible",
-                "Tipo de Cuenta" to "No disponible",
-                "Número de Cuenta" to "No disponible",
-                "Correo" to "No disponible"
+                "Nombre" to "Nombre No disponible",
+                "RUT" to "Rut No disponible",
+                "Banco" to "Banco No disponible",
+                "Tipo de Cuenta" to "T. CuentaNo disponible",
+                "Número de Cuenta" to "N. Cuenta No disponible",
+                "Correo" to "Correo No disponible"
             )
         }
     }

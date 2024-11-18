@@ -1,7 +1,8 @@
 <resources>
     <color name="green">#4CAF50</color>
     <color name="red">#F44336</color>
-    <color name="md_theme_primary">#415F91</color>
+
+    <color name="md_theme_primary">#132E13</color>
     <color name="md_theme_onPrimary">#fbf9f7</color>
     <color name="md_theme_primaryContainer">#D6E3FF</color>
     <color name="md_theme_onPrimaryContainer">#001B3E</color>
