@@ -55,10 +55,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
-                    android:text="Contenido de la tarjeta"
+                    android:text="Luquita está en fase Alpha, Donde algunas funciones no están pulidas y requiere Pruebas y Feedback"
                     android:textColor="@color/md_theme_muted"
-                    android:textSize="14sp"
-                    android:gravity="center" />
+                    android:textSize="14sp"/>
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>

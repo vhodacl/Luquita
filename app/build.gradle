@@ -11,19 +11,18 @@ buildscript {
 }
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
 }
 
 android {
     namespace 'com.vhoda.luquita'
-    compileSdk 35 // Cambiado de 35 a 34 ya que 35 aún no existe
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.vhoda.luquita"
         minSdkVersion 23
-        minSdk 21
-        targetSdk 35  // Cambiado de 35 a 34
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -36,60 +35,66 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
     buildFeatures {
         viewBinding true
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+            universalApk false
+        }
     }
 }
 
 dependencies {
-    implementation libs.androidx.core.ktx
-    implementation libs.androidx.appcompat
-    implementation libs.material
-    implementation libs.androidx.constraintlayout
-    implementation libs.androidx.navigation.fragment.ktx
-    implementation libs.androidx.navigation.ui.ktx
+    implementation "androidx.core:core-ktx:1.12.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "com.google.android.material:material:1.11.0"
+    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.7.1"
+    implementation "androidx.navigation:navigation-ui-ktx:2.7.1"
 
-    // CameraX - actualizadas las versiones
-    def camerax_version = "1.3.0"
-    implementation "androidx.camera:camera-core:${camerax_version}"
-    implementation "androidx.camera:camera-camera2:${camerax_version}"
-    implementation "androidx.camera:camera-lifecycle:${camerax_version}"
-    implementation "androidx.camera:camera-view:${camerax_version}"
-    implementation "androidx.camera:camera-extensions:${camerax_version}"
+    // CameraX
+    implementation "androidx.camera:camera-core:1.3.0"
+    implementation "androidx.camera:camera-camera2:1.3.0"
+    implementation "androidx.camera:camera-lifecycle:1.3.0"
+    implementation "androidx.camera:camera-view:1.3.0"
+    implementation "androidx.camera:camera-extensions:1.3.0"
 
-    implementation "androidx.camera:camera-core:1.1.0"
-    implementation "androidx.camera:camera-camera2:1.1.0"
-    implementation "androidx.camera:camera-lifecycle:1.1.0"
-    implementation "androidx.camera:camera-view:1.0.0"
+    // Activity y Fragment KTX
+    implementation "androidx.activity:activity-ktx:1.8.2"
+    implementation "androidx.fragment:fragment-ktx:1.6.2"
 
-    // Activity y Fragment KTX - versiones actualizadas y unificadas
-    def activity_version = "1.8.2"
-    def fragment_version = "1.6.2"
-    implementation libs.androidx.activity.ktx
-    implementation libs.androidx.fragment.ktx
+    // Reconocimiento de texto - ML Kit
+    implementation "com.google.mlkit:text-recognition:16.0.0"
 
-    // Eliminar estas implementaciones duplicadas ya que están en las versiones KTX arriba
-     implementation "androidx.activity:activity:1.9.3"
-     implementation "androidx.fragment:fragment:1.8.5"
+    // Glide para manejo de imágenes
+    implementation "com.github.bumptech.glide:glide:4.15.1"
+    annotationProcessor "com.github.bumptech.glide:compiler:4.15.1"
 
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.8.7"
-    implementation 'androidx.viewpager2:viewpager2:1.0.0'
-    implementation libs.guava
+    // Testing
+    testImplementation "junit:junit:4.13.2"
+    androidTestImplementation "androidx.test.ext:junit:1.1.5"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
 
-    implementation libs.text.recognition
 
-    implementation 'com.github.bumptech.glide:glide:4.15.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
-
-    testImplementation libs.junit
-    androidTestImplementation libs.androidx.junit
-    androidTestImplementation libs.androidx.espresso.core
 }

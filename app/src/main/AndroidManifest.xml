@@ -1,12 +1,11 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.vhoda.luquita">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
 
-    <!-- Esta línea indica que la cámara no es un requerimiento obligatorio -->
-    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <!-- La cámara no es un requerimiento obligatorio -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -31,7 +30,7 @@
         <activity android:name=".CameraActivity" />
         <activity android:name=".ResultActivity" />
 
-        <!-- Actividad de bienvenida (WelcomeActivity) -->
+        <!-- Actividad de bienvenida (WelcomeActivity), actualmente inactiva -->
         <activity
             android:name=".WelcomeActivity"
             android:exported="true"
