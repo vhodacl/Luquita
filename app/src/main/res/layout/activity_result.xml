@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="35dp"
         app:cardBackgroundColor="@color/md_theme_tertiary"
-        app:cardCornerRadius="18dp"
+        app:cardCornerRadius="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/copiedText"
@@ -31,9 +31,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="8dp">
 
                 <ImageView
                     android:id="@+id/logoImageView"
@@ -42,7 +43,11 @@
                     android:layout_marginEnd="12dp" />
 
             </LinearLayout>
-
+            <!-- Separador -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0" />
             <!-- Nombre de la Compañía o Usuario -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -252,7 +257,7 @@
 
                 <ImageView
                     android:layout_width="32dp"
-                    android:layout_height="16dp"
+                    android:layout_height="18dp"
                     android:src="@drawable/copy"
                     app:tint="@color/md_theme_brownie" />
 
@@ -260,7 +265,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="0dp"
-                    android:text="Copiar Todo"
+                    android:text="Copiar"
+                    android:textStyle="bold"
                     android:textColor="@color/md_theme_brownie"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -289,7 +295,7 @@
 
                 <ImageView
                     android:layout_width="32dp"
-                    android:layout_height="16dp"
+                    android:layout_height="18dp"
                     android:src="@drawable/share"
                     app:tint="@color/md_theme_brownie" />
 
@@ -298,6 +304,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="0dp"
                     android:text="Compartir"
+                    android:textStyle="bold"
                     android:textColor="@color/md_theme_brownie"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -330,6 +337,7 @@
         android:background="@drawable/rounded_button"
         android:padding="16dp"
         android:text="Listo"
+        android:textStyle="bold"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

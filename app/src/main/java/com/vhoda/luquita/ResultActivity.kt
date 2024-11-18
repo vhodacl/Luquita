@@ -1,3 +1,4 @@
+// ResultActivity.kt
 package com.vhoda.luquita
 
 import android.content.ClipData
@@ -12,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.vhoda.luquita.databinding.ActivityResultBinding
 import com.google.android.material.button.MaterialButton
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 
 class ResultActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResultBinding
@@ -43,6 +47,22 @@ class ResultActivity : AppCompatActivity() {
         setupUI(dataMap)
     }
 
+    private val bankLogos = mapOf(
+        "Banco Estado" to R.drawable.bancoestado,
+        "Banco Santander" to R.drawable.santander,
+        "Banco de Chile" to R.drawable.bancochile,
+        "Banco Falabella" to R.drawable.bancofalabella,
+        "BCI" to R.drawable.bci,
+        "Mercado Pago" to R.drawable.mercadopago,
+        "Scotiabank" to R.drawable.scotiabank,
+        "Itaú" to R.drawable.itau,
+        "Tenpo" to R.drawable.tenpo,
+        "TAPP" to R.drawable.tapp,
+        "Copec" to R.drawable.copec,
+        "MACH" to R.drawable.mach
+    )
+
+
     private fun setupUI(dataMap: Map<String, String>) {
         with(binding) {
             // Configuración de los campos (mapear TextViews y el campo correspondiente en el mapa)
@@ -67,6 +87,30 @@ class ResultActivity : AppCompatActivity() {
 
             // Configuración de los botones
             setupButtons(dataMap)
+
+            // Configuración de la visibilidad de los campos y el logo del banco
+            configureBankLogo(dataMap)
+        }
+    }
+
+    private fun configureBankLogo(dataMap: Map<String, String>) {
+        // Obtener el nombre del banco del mapa de datos
+        val bankName = dataMap["Banco"]
+        // Obtener el recurso del logo correspondiente
+        val logoResource = bankLogos[bankName]
+
+        // Obtener el ImageView donde se mostrará el logo
+        val logoImageView: ImageView = findViewById(R.id.logoImageView)
+
+        // Si existe un logo para ese banco, cargarlo con Glide
+        if (logoResource != null) {
+            Glide.with(this)  // Aquí `this` se refiere al contexto de la Activity
+                .load(logoResource)  // Cargar el logo (puede ser un recurso o una URL)
+                .apply(RequestOptions().transform(RoundedCorners(15)))  // Borde redondeado de 8px
+                .into(logoImageView)  // Mostrarlo en el ImageView
+            logoImageView.visibility = View.VISIBLE  // Hacer visible el ImageView
+        } else {
+            logoImageView.visibility = View.GONE  // Ocultar el ImageView si no hay logo
         }
     }
 
@@ -86,7 +130,13 @@ class ResultActivity : AppCompatActivity() {
             }
 
             // Configuración del botón de "Hecho"
-            doneButton.setOnClickListener { finish() }
+            doneButton.setOnClickListener {
+                // Redirigir a MainActivity, independientemente de la fuente
+                val intent = Intent(this@ResultActivity, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+            }
 
             // Configuración del botón Copiar Todo
             copyAllCard.setOnClickListener {
@@ -164,12 +214,12 @@ class ResultActivity : AppCompatActivity() {
     // Parsear el texto detectado por OCR
     private fun parseDetectedData(detectedText: String): Map<String, String> {
         val dataMap = mutableMapOf(
-            "Nombre" to "No disponible",
-            "RUT" to "No disponible",
-            "Correo" to "No disponible",
-            "Banco" to "No disponible",
-            "Tipo de Cuenta" to "No disponible",
-            "Número de Cuenta" to "No disponible"
+            "Nombre" to "Nombre No disponible",
+            "RUT" to "RUT No disponible",
+            "Correo" to "Correo No disponible",
+            "Banco" to "Banco No disponible",
+            "Tipo de Cuenta" to "T. Cuenta No disponible",
+            "Número de Cuenta" to "N. Cuenta No disponible"
         )
 
         detectedText.split("\n").forEach { line ->
@@ -232,5 +282,6 @@ class ResultActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_DETECTED_TEXT = "detected_text"
+        const val EXTRA_BANK_DATA = "detected_text"
     }
 }
