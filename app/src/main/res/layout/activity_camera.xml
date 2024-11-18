@@ -115,14 +115,15 @@
                 app:strokeColor="#ebe9e7">
 
                 <ImageView
-                    android:id="@+id/btn_flash_icon"
+                    android:id="@+id/btnFlashIcon"
                     android:layout_width="26dp"
                     android:layout_height="26dp"
-                    android:src="@drawable/flashlight"
+                    android:src="@android:drawable/ic_menu_camera"
                     android:scaleType="fitCenter"
                     android:contentDescription="Flash"
                     android:layout_gravity="center"
                     android:tint="#fbf9f7" />
+
             </com.google.android.material.card.MaterialCardView>
         </FrameLayout>
 

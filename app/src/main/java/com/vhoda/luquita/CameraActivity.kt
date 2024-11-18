@@ -38,15 +38,43 @@ class CameraActivity : AppCompatActivity() {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     private var lastProcessedText = ""
     private var lastProcessTime = 0L
-
     private lateinit var scanRegion: RectF
     private var previewWidth: Int = 0
     private var previewHeight: Int = 0
-
     private val CAMERA_PERMISSION_REQUEST_CODE = 1001
     private val PROCESS_INTERVAL = 1000L
-
     private var isTextDetected = false
+
+    data class BankData(
+        var companyName: String? = null,
+        var rut: String? = null,
+        var bank: String? = null,
+        var accountType: String? = null,
+        var accountNumber: String? = null,
+        var email: String? = null
+    ) {
+        fun isValid(): Boolean {
+            var validFields = 0
+            if (!companyName.isNullOrBlank()) validFields++
+            if (!rut.isNullOrBlank() && rut!!.matches(Regex("\\d{1,2}\\d{3}\\d{3}-[\\dkK]"))) validFields++
+            if (!bank.isNullOrBlank()) validFields++
+            if (!accountType.isNullOrBlank()) validFields++
+            if (!accountNumber.isNullOrBlank()) validFields++
+            if (!email.isNullOrBlank() && email!!.contains("@")) validFields++
+            return validFields >= 3
+        }
+
+        fun toMap(): Map<String, String> {
+            return mapOf(
+                "Nombre" to (companyName ?: ""),
+                "RUT" to (rut ?: ""),
+                "Banco" to (bank ?: ""),
+                "Tipo de Cuenta" to (accountType ?: ""),
+                "Número de Cuenta" to (accountNumber ?: ""),
+                "Correo" to (email ?: "")
+            )
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -188,13 +216,13 @@ class CameraActivity : AppCompatActivity() {
                             val detectedText = visionText.text.trim()
                             if (detectedText.isNotEmpty() && detectedText != lastProcessedText) {
                                 lastProcessedText = detectedText
-                                if (!isTextDetected) {
+                                val bankData = parseBankData(detectedText)
+
+                                if (bankData.isValid() && !isTextDetected) {
                                     isTextDetected = true
-                                    runOnUiThread {
-                                        binding.goToResultButton.visibility = View.VISIBLE
-                                    }
                                     val intent = Intent(this@CameraActivity, ResultActivity::class.java)
                                     intent.putExtra(ResultActivity.EXTRA_DETECTED_TEXT, detectedText)
+                                    intent.putExtra("BANK_DATA", bankData.toMap().toString())
                                     startActivity(intent)
                                     finish()
                                 }
@@ -209,20 +237,76 @@ class CameraActivity : AppCompatActivity() {
                             imageProxy.close()
                             isProcessingImage = false
                         }
-                } else {
-                    bitmap.recycle()
-                    imageProxy.close()
-                    isProcessingImage = false
                 }
-            } else {
-                imageProxy.close()
-                isProcessingImage = false
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error en processImageForOCR: ${e.message}")
             imageProxy.close()
             isProcessingImage = false
         }
+    }
+
+    private fun parseBankData(text: String): BankData {
+        val bankData = BankData()
+        val lines = text.split("\n")
+
+        for (line in lines) {
+            val normalizedLine = line.trim().lowercase()
+
+            when {
+                // RUT detection (XX.XXX.XXX-X format)
+                line.matches(Regex(".*\\d{1,2}\\.\\d{3}\\.\\d{3}-[\\dkK].*")) -> {
+                    bankData.rut = line.replace(Regex("[^0-9Kk-]"), "")
+                }
+
+                // Email detection
+                line.contains("@") && line.contains(".") -> {
+                    bankData.email = line.trim()
+                }
+
+                // Bank detection with specific cases
+                normalizedLine.contains("banco") -> {
+                    bankData.bank = when {
+                        normalizedLine.contains("estado") -> "Banco Estado"
+                        normalizedLine.contains("santander") -> "Banco Santander"
+                        normalizedLine.contains("chile") -> "Banco de Chile"
+                        normalizedLine.contains("bci") -> "BCI"
+                        else -> line.substringAfter("banco").trim().capitalize()
+                    }
+                }
+
+                // Account type detection
+                normalizedLine.contains("cuenta") || normalizedLine.contains("cta") -> {
+                    bankData.accountType = when {
+                        normalizedLine.contains("rut") -> "Cuenta RUT"
+                        normalizedLine.contains("corriente") -> "Cuenta Corriente"
+                        normalizedLine.contains("vista") -> "Cuenta Vista"
+                        normalizedLine.contains("ahorro") -> "Cuenta de Ahorro"
+                        else -> line.trim().capitalize()
+                    }
+                }
+
+                // Account number detection (7-20 digits)
+                line.matches(Regex(".*\\d{7,20}.*")) &&
+                        !line.contains("rut", true) &&
+                        bankData.accountNumber == null -> {
+                    bankData.accountNumber = line.replace(Regex("[^0-9]"), "")
+                }
+
+                // Company/Person name detection
+                (line.contains("ltda", true) ||
+                        line.contains("s.a", true) ||
+                        line.contains("spa", true) ||
+                        (line.length > 5 && !line.contains("@") &&
+                                !line.matches(Regex(".*\\d{7,20}.*")))) -> {
+                    if (bankData.companyName == null) {
+                        bankData.companyName = line.trim()
+                    }
+                }
+            }
+        }
+
+        return bankData
     }
 
     private fun ImageProxy.toBitmap(): Bitmap? {
@@ -249,7 +333,6 @@ class CameraActivity : AppCompatActivity() {
 
     private fun cropBitmap(bitmap: Bitmap, rotation: Int): Bitmap? {
         return try {
-            // Ajustar las coordenadas según la rotación
             val (cropX, cropY, cropWidth, cropHeight) = when (rotation) {
                 90, 270 -> {
                     val x = (scanRegion.top * bitmap.width).roundToInt()
@@ -267,23 +350,9 @@ class CameraActivity : AppCompatActivity() {
                 }
             }
 
-            // Validar coordenadas
-            if (cropX < 0 || cropY < 0 || cropWidth <= 0 || cropHeight <= 0 ||
-                cropX + cropWidth > bitmap.width || cropY + cropHeight > bitmap.height) {
-                Log.e(TAG, "Coordenadas de recorte inválidas")
-                return null
-            }
-
-            // Crear el bitmap recortado
-            Bitmap.createBitmap(
-                bitmap,
-                cropX,
-                cropY,
-                cropWidth,
-                cropHeight
-            )
+            Bitmap.createBitmap(bitmap, cropX, cropY, cropWidth, cropHeight)
         } catch (e: Exception) {
-            Log.e(TAG, "Error al recortar bitmap: ${e.message}")
+            Log.e(TAG, "Error al recortar la imagen: ${e.message}")
             null
         }
     }
@@ -293,28 +362,9 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun updateFlashIcon() {
-        val flashIcon = if (isFlashOn) R.drawable.flashlight else R.drawable.flashlight_off
-        binding.btnFlashIcon.setImageResource(flashIcon)
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startCamera()
-            } else {
-                Toast.makeText(
-                    this,
-                    "Se necesita permiso de cámara para continuar",
-                    Toast.LENGTH_SHORT
-                ).show()
-                finish()
-            }
-        }
+        binding.btnFlashIcon.setImageResource(
+            if (isFlashOn) R.drawable.flashlight else R.drawable.flashlight_off
+        )
     }
 
     override fun onDestroy() {
