@@ -6,24 +6,27 @@
     android:background="@color/md_theme_onPrimary"
     android:fitsSystemWindows="true">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar3"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
-        app:elevation="0dp"
-        android:fitsSystemWindows="true">
+        android:textAlignment="center"
+        app:titleCentered="true">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/transparent"
-            app:title="Luquita"
-            app:titleTextColor="@color/md_theme_brownie"
-            app:titleCentered="true"
-            android:textAlignment="center"
-            android:textStyle="bold" /> <!-- Aquí está la propiedad para poner el título en negrita -->
-    </com.google.android.material.appbar.AppBarLayout>
+        <!-- ImageView con tamaño fijo y escala adaptable -->
+        <ImageView
+        android:id="@+id/toolbar_image"
+        android:layout_width="114dp"
+        android:layout_height="60dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/luquitalogocompleto"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center"
+        app:cardBackgroundColor="@color/md_theme_tertiary"/>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+
 
 
     <RelativeLayout
@@ -150,5 +153,20 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
+        <!-- Botón Listo -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/doneButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded_button"
+            android:padding="8dp"
+            android:text="Pegar y Normalizar"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </RelativeLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

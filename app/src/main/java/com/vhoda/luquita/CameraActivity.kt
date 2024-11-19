@@ -255,7 +255,6 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-
     private fun parseBankData(text: String): BankData {
         val bankData = BankData()
         val lines = text.split("\n")
@@ -295,23 +294,33 @@ class CameraActivity : AppCompatActivity() {
                     }
                 }
 
-                // Lógica específica para Banco Estado
+                // Lógica específica para Banco Estado y variaciones de "cta rut"
                 normalizedLine.contains("banco estado") ||
                         normalizedLine.contains("cuenta rut") ||
-                        normalizedLine.contains("cta rut") -> {
+                        normalizedLine.contains("cta rut") ||
+                        normalizedLine.contains("ctarut") ||
+                        normalizedLine.contains("cta.rut") ||
+                        normalizedLine.contains("c. rut") -> {
                     bankData.bank = "Banco Estado"
-                    bankData.accountType = when {
-                        normalizedLine.contains("cuenta rut") || normalizedLine.contains("cta rut") -> "Cuenta RUT"
-                        normalizedLine.contains("cuenta vista") -> "Cuenta Vista"
-                        else -> bankData.accountType
+
+                    // Verificar que "Cta rut" o sus variaciones se asignen como "Cuenta RUT"
+                    if (normalizedLine.contains("cta rut") ||
+                        normalizedLine.contains("ctarut") ||
+                        normalizedLine.contains("cta.rut") ||
+                        normalizedLine.contains("c. rut")) {
+                        bankData.accountType = "Cuenta RUT"
+                    }
+                    // Si "cuenta vista" aparece en la línea, asignar "Cuenta Vista"
+                    else if (normalizedLine.contains("cuenta vista") && bankData.accountType != "Cuenta RUT") {
+                        bankData.accountType = "Cuenta Vista"
                     }
                 }
 
                 // Detectar tipos de cuenta basados en palabras clave
                 normalizedLine.contains("cuenta") || normalizedLine.contains("cta") -> {
                     when {
-                        normalizedLine.contains("rut") -> bankData.accountType = "Cuenta RUT"
-                        normalizedLine.contains("vista") -> bankData.accountType = "Cuenta Vista"
+                        normalizedLine.contains("rut") && bankData.accountType != "Cuenta RUT" -> bankData.accountType = "Cuenta RUT"
+                        normalizedLine.contains("vista") && bankData.accountType != "Cuenta RUT" -> bankData.accountType = "Cuenta Vista"
                         normalizedLine.contains("corriente") -> bankData.accountType = "Cuenta Corriente"
                         normalizedLine.contains("electronica") -> bankData.accountType = "Chequera Electrónica"
                         normalizedLine.contains("chequera") -> bankData.accountType = "Chequera Electrónica"
@@ -326,9 +335,11 @@ class CameraActivity : AppCompatActivity() {
                     bankData.accountNumber = line.replace(Regex("[^0-9]"), "")
                 }
 
-                // Detectar RUT (formato xx.xxx.xxx-x o xxxxxxxx-x)
-                line.matches(Regex(".*\\b\\d{1,2}\\.?\\d{3}\\.?\\d{3}-\\d\\b.*")) -> {
-                    bankData.rut = line.replace(Regex("[^\\dxX.-]"), "").trim()
+                // Detectar RUT (formato xx.xxx.xxx-x o xxxxxxxx-x) y preservarlo
+                line.matches(Regex(".*\\b\\d{1,2}\\.?\\d{3}\\.?\\d{3}-?\\d{1,2}\\b.*")) -> {
+                    // Mantener el RUT con el formato completo, incluyendo el dígito verificador
+                    val rut = line.replace(Regex("[^\\dxX.-]"), "").trim()
+                    bankData.rut = rut
                 }
 
                 // Detectar correos electrónicos
