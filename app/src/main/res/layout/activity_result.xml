@@ -138,8 +138,8 @@
                 android:orientation="horizontal"
                 android:padding="12dp">
 
-                <TextView
-                    android:id="@+id/bankTextView"
+                <Spinner
+                    android:id="@+id/bankSpinner"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -165,8 +165,8 @@
                 android:orientation="horizontal"
                 android:padding="12dp">
 
-                <TextView
-                    android:id="@+id/accountTypeTextView"
+                <Spinner
+                    android:id="@+id/accountTypeSpinner"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

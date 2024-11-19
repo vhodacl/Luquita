@@ -1,4 +1,3 @@
-// ResultActivity.kt
 package com.vhoda.luquita
 
 import android.content.ClipData
@@ -6,19 +5,58 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.vhoda.luquita.databinding.ActivityResultBinding
-import com.google.android.material.button.MaterialButton
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 
 class ResultActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResultBinding
+
+    // Lista completa de bancos disponibles
+    private val banksList = listOf(
+        "Seleccione un banco",
+        "Banco Estado",
+        "Banco Santander",
+        "Banco de Chile",
+        "Banco Falabella",
+        "Banco Crédito e Inversiones",
+        "Mercado Pago",
+        "Scotiabank",
+        "Itaú",
+        "Tenpo",
+        "TAPP",
+        "Copec",
+        "MACH"
+    )
+
+    // Lista de tipos de cuenta
+    private val accountTypesList = listOf(
+        "Seleccione tipo de cuenta",
+        "Cuenta de Ahorro",
+        "Cuenta Corriente",
+        "Chequera Electrónica",
+        "Cuenta Vista"
+    )
+
+    private val bankLogos = mapOf(
+        "Banco Estado" to R.drawable.bancoestado,
+        "Banco Santander" to R.drawable.santander,
+        "Banco de Chile" to R.drawable.bancochile,
+        "Banco Falabella" to R.drawable.bancofalabella,
+        "Banco Crédito e Inversiones" to R.drawable.bci,
+        "BCI" to R.drawable.bci,
+        "Mercado Pago" to R.drawable.mercadopago,
+        "Scotiabank" to R.drawable.scotiabank,
+        "Itaú" to R.drawable.itau,
+        "Tenpo" to R.drawable.tenpo,
+        "TAPP" to R.drawable.tapp,
+        "Copec" to R.drawable.copec,
+        "MACH" to R.drawable.mach
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,37 +83,64 @@ class ResultActivity : AppCompatActivity() {
 
         // Configurar la UI con los datos parseados
         setupUI(dataMap)
+        setupSpinners(dataMap)
     }
 
-    private val bankLogos = mapOf(
-        "Banco Estado" to R.drawable.bancoestado,
-        "Banco Santander" to R.drawable.santander,
-        "Banco de Chile" to R.drawable.bancochile,
-        "Banco Falabella" to R.drawable.bancofalabella,
-        "BCI" to R.drawable.bci,
-        "Mercado Pago" to R.drawable.mercadopago,
-        "Scotiabank" to R.drawable.scotiabank,
-        "Itaú" to R.drawable.itau,
-        "Tenpo" to R.drawable.tenpo,
-        "TAPP" to R.drawable.tapp,
-        "Copec" to R.drawable.copec,
-        "MACH" to R.drawable.mach
-    )
+    private fun setupSpinners(dataMap: Map<String, String>) {
+        // Configurar Spinner de Bancos
+        val bankAdapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            banksList
+        ).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
 
+        binding.bankSpinner.apply {
+            adapter = bankAdapter
+            // Seleccionar el banco detectado si existe
+            val detectedBank = dataMap["Banco"]
+            val bankPosition = banksList.indexOf(detectedBank)
+            setSelection(if (bankPosition != -1) bankPosition else 0)
+
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    if (position > 0) {
+                        val selectedBank = banksList[position]
+                        configureBankLogo(mapOf("Banco" to selectedBank))
+                    }
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        }
+
+        // Configurar Spinner de Tipos de Cuenta
+        val accountTypeAdapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            accountTypesList
+        ).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+
+        binding.accountTypeSpinner.apply {
+            adapter = accountTypeAdapter
+            // Seleccionar el tipo de cuenta detectado si existe
+            val detectedAccountType = dataMap["Tipo de Cuenta"]
+            val accountTypePosition = accountTypesList.indexOf(detectedAccountType)
+            setSelection(if (accountTypePosition != -1) accountTypePosition else 0)
+        }
+    }
 
     private fun setupUI(dataMap: Map<String, String>) {
         with(binding) {
-            // Configuración de los campos (mapear TextViews y el campo correspondiente en el mapa)
             val fieldMappings = listOf(
                 Triple(companyNameTextView, companyNameTextView.parent as View, "Nombre"),
                 Triple(rutTextView, rutTextView.parent as View, "RUT"),
                 Triple(emailTextView, emailTextView.parent as View, "Correo"),
-                Triple(bankTextView, bankTextView.parent as View, "Banco"),
-                Triple(accountTypeTextView, accountTypeTextView.parent as View, "Tipo de Cuenta"),
                 Triple(accountNumberTextView, accountNumberTextView.parent as View, "Número de Cuenta")
             )
 
-            // Configuración de cada campo
             fieldMappings.forEach { (textView, parentView, key) ->
                 setupField(
                     valueTextView = textView,
@@ -85,32 +150,25 @@ class ResultActivity : AppCompatActivity() {
                 )
             }
 
-            // Configuración de los botones
             setupButtons(dataMap)
-
-            // Configuración de la visibilidad de los campos y el logo del banco
             configureBankLogo(dataMap)
         }
     }
 
     private fun configureBankLogo(dataMap: Map<String, String>) {
-        // Obtener el nombre del banco del mapa de datos
         val bankName = dataMap["Banco"]
-        // Obtener el recurso del logo correspondiente
         val logoResource = bankLogos[bankName]
 
-        // Obtener el ImageView donde se mostrará el logo
-        val logoImageView: ImageView = findViewById(R.id.logoImageView)
-
-        // Si existe un logo para ese banco, cargarlo con Glide
-        if (logoResource != null) {
-            Glide.with(this)  // Aquí `this` se refiere al contexto de la Activity
-                .load(logoResource)  // Cargar el logo (puede ser un recurso o una URL)
-                .apply(RequestOptions().transform(RoundedCorners(15)))  // Borde redondeado de 8px
-                .into(logoImageView)  // Mostrarlo en el ImageView
-            logoImageView.visibility = View.VISIBLE  // Hacer visible el ImageView
-        } else {
-            logoImageView.visibility = View.GONE  // Ocultar el ImageView si no hay logo
+        binding.logoImageView.apply {
+            if (logoResource != null) {
+                Glide.with(this@ResultActivity)
+                    .load(logoResource)
+                    .apply(RequestOptions().transform(RoundedCorners(15)))
+                    .into(this)
+                visibility = View.VISIBLE
+            } else {
+                visibility = View.GONE
+            }
         }
     }
 
@@ -118,7 +176,6 @@ class ResultActivity : AppCompatActivity() {
         with(binding) {
             val hasInvalidFields = dataMap.any { it.value == "No disponible" }
 
-            // Configuración del botón de reintento
             retryButton.apply {
                 visibility = if (hasInvalidFields) View.VISIBLE else View.GONE
                 setOnClickListener {
@@ -129,25 +186,31 @@ class ResultActivity : AppCompatActivity() {
                 }
             }
 
-            // Configuración del botón de "Hecho"
             doneButton.setOnClickListener {
-                // Redirigir a MainActivity, independientemente de la fuente
                 val intent = Intent(this@ResultActivity, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)
                 finish()
             }
 
-            // Configuración del botón Copiar Todo
             copyAllCard.setOnClickListener {
-                val allData = dataMap
-                    .map { it.value ?: "" }  // Convertimos los valores nulos a cadenas vacías
-                    .joinToString(separator = "\n")  // Unimos los valores con salto de línea
-
-                // Copiar al portapapeles
+                val allData = getAllData()
                 copyToClipboard(allData)
-                showCopiedIndicator()  // Mostrar mensaje de "Copiado"
+                showCopiedIndicator()
             }
+        }
+    }
+
+    private fun getAllData(): String {
+        with(binding) {
+            return listOf(
+                companyNameTextView.text,
+                rutTextView.text,
+                emailTextView.text,
+                bankSpinner.selectedItem.toString(),
+                accountTypeSpinner.selectedItem.toString(),
+                accountNumberTextView.text
+            ).joinToString("\n")
         }
     }
 
@@ -157,30 +220,24 @@ class ResultActivity : AppCompatActivity() {
         value: String?,
         key: String
     ) {
-        // Si el valor está vacío o es nulo, ponemos "No disponible"
         val finalValue = value?.takeIf { it.isNotBlank() } ?: "No disponible"
 
-        // Configuramos el TextView con el valor
         valueTextView.apply {
             text = finalValue
             contentDescription = "$key: $finalValue"
         }
 
-        // Configuramos el ImageView para indicar si el campo es válido o no
-        val statusImageView = (parentView as? android.widget.LinearLayout)?.let { layout ->
-            layout.findViewById<ImageView>(android.R.id.empty)?.apply {
-                val isValid = finalValue != "No disponible"
-                setImageResource(if (isValid) R.drawable.task_alt else R.drawable.error)
-                imageTintList = ContextCompat.getColorStateList(
-                    context,
-                    if (isValid) R.color.green else R.color.red
-                )
-                contentDescription = if (isValid) "Campo válido" else "Campo no disponible"
-            }
+        (parentView as? LinearLayout)?.findViewById<ImageView>(android.R.id.empty)?.apply {
+            val isValid = finalValue != "No disponible"
+            setImageResource(if (isValid) R.drawable.task_alt else R.drawable.error)
+            imageTintList = ContextCompat.getColorStateList(
+                context,
+                if (isValid) R.color.green else R.color.red
+            )
+            contentDescription = if (isValid) "Campo válido" else "Campo no disponible"
         }
     }
 
-    // Método para parsear la cadena de datos del banco
     private fun parseBankDataString(bankDataString: String): Map<String, String> {
         return try {
             bankDataString
@@ -192,17 +249,16 @@ class ResultActivity : AppCompatActivity() {
                 }
         } catch (e: Exception) {
             mapOf(
-                "Nombre" to "Nombre No disponible",
-                "RUT" to "Rut No disponible",
-                "Banco" to "Banco No disponible",
-                "Tipo de Cuenta" to "T. Cuenta No disponible",
-                "Número de Cuenta" to "N. Cuenta No disponible",
-                "Correo" to "Correo No disponible"
+                "Nombre" to "No disponible",
+                "RUT" to "No disponible",
+                "Banco" to "No disponible",
+                "Tipo de Cuenta" to "No disponible",
+                "Número de Cuenta" to "No disponible",
+                "Correo" to "No disponible"
             )
         }
     }
 
-    // Verificar si los datos son válidos (al menos 3 campos no disponibles)
     private fun isDataValid(dataMap: Map<String, String>): Boolean {
         var validFields = 0
         dataMap.forEach { (_, value) ->
@@ -211,15 +267,14 @@ class ResultActivity : AppCompatActivity() {
         return validFields >= 3
     }
 
-    // Parsear el texto detectado por OCR
     private fun parseDetectedData(detectedText: String): Map<String, String> {
         val dataMap = mutableMapOf(
-            "Nombre" to "Nombre No disponible",
-            "RUT" to "RUT No disponible",
-            "Correo" to "Correo No disponible",
-            "Banco" to "Banco No disponible",
-            "Tipo de Cuenta" to "T. Cuenta No disponible",
-            "Número de Cuenta" to "N. Cuenta No disponible"
+            "Nombre" to "No disponible",
+            "RUT" to "No disponible",
+            "Correo" to "No disponible",
+            "Banco" to "No disponible",
+            "Tipo de Cuenta" to "No disponible",
+            "Número de Cuenta" to "No disponible"
         )
 
         detectedText.split("\n").forEach { line ->
@@ -230,8 +285,15 @@ class ResultActivity : AppCompatActivity() {
                         trimmedLine.contains("estado", ignoreCase = true) -> dataMap["Banco"] = "Banco Estado"
                         trimmedLine.contains("santander", ignoreCase = true) -> dataMap["Banco"] = "Banco Santander"
                         trimmedLine.contains("chile", ignoreCase = true) -> dataMap["Banco"] = "Banco de Chile"
+                        trimmedLine.contains("falabella", ignoreCase = true) -> dataMap["Banco"] = "Banco Falabella"
                         trimmedLine.contains("bci", ignoreCase = true) -> dataMap["Banco"] = "BCI"
-                        else -> dataMap["Banco"] = extractValue(trimmedLine)
+                        trimmedLine.contains("mercado pago", ignoreCase = true) -> dataMap["Banco"] = "Mercado Pago"
+                        trimmedLine.contains("scotia", ignoreCase = true) -> dataMap["Banco"] = "Scotiabank"
+                        trimmedLine.contains("itau", ignoreCase = true) -> dataMap["Banco"] = "Itaú"
+                        trimmedLine.contains("tenpo", ignoreCase = true) -> dataMap["Banco"] = "Tenpo"
+                        trimmedLine.contains("tapp", ignoreCase = true) -> dataMap["Banco"] = "TAPP"
+                        trimmedLine.contains("copec", ignoreCase = true) -> dataMap["Banco"] = "Copec"
+                        trimmedLine.contains("mach", ignoreCase = true) -> dataMap["Banco"] = "MACH"
                     }
                 }
                 trimmedLine.matches(Regex(".*\\d{1,2}[.]\\d{3}[.]\\d{3}-[\\dkK].*")) -> {
@@ -243,10 +305,10 @@ class ResultActivity : AppCompatActivity() {
                 trimmedLine.contains("cuenta", ignoreCase = true) ||
                         trimmedLine.contains("cta", ignoreCase = true) -> {
                     when {
-                        trimmedLine.contains("rut", ignoreCase = true) -> dataMap["Tipo de Cuenta"] = "Cuenta RUT"
-                        trimmedLine.contains("corriente", ignoreCase = true) -> dataMap["Tipo de Cuenta"] = "Cuenta Corriente"
-                        trimmedLine.contains("vista", ignoreCase = true) -> dataMap["Tipo de Cuenta"] = "Cuenta Vista"
                         trimmedLine.contains("ahorro", ignoreCase = true) -> dataMap["Tipo de Cuenta"] = "Cuenta de Ahorro"
+                        trimmedLine.contains("corriente", ignoreCase = true) -> dataMap["Tipo de Cuenta"] = "Cuenta Corriente"
+                        trimmedLine.contains("chequera", ignoreCase = true) -> dataMap["Tipo de Cuenta"] = "Chequera Electrónica"
+                        trimmedLine.contains("vista", ignoreCase = true) -> dataMap["Tipo de Cuenta"] = "Cuenta Vista"
                     }
                 }
                 trimmedLine.matches(Regex(".*\\d{7,20}.*")) &&
@@ -254,28 +316,17 @@ class ResultActivity : AppCompatActivity() {
                         dataMap["Número de Cuenta"] == "No disponible" -> {
                     dataMap["Número de Cuenta"] = trimmedLine.replace(Regex("[^0-9]"), "")
                 }
-                (trimmedLine.contains("digito") || trimmedLine.contains("verificador")) &&
-                        dataMap["RUT"] == "No disponible" -> {
-                    dataMap["RUT"] = trimmedLine.split(":").lastOrNull()?.trim() ?: ""
-                }
             }
         }
         return dataMap
     }
 
-    // Extraer el valor después de ":", por ejemplo en "Banco: Santander"
-    private fun extractValue(line: String): String {
-        return line.substringAfter(":").trim()
-    }
-
-    // Copiar al portapapeles
     private fun copyToClipboard(data: String) {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Detected Data", data)
         clipboard.setPrimaryClip(clip)
     }
 
-    // Mostrar mensaje de copiado
     private fun showCopiedIndicator() {
         Toast.makeText(this, "Copiado al portapapeles", Toast.LENGTH_SHORT).show()
     }
