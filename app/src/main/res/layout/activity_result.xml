@@ -7,6 +7,27 @@
     android:background="#F5F5F5"
     tools:context=".ResultActivity">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar3"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        android:textAlignment="center"
+        app:titleCentered="true">
+
+        <!-- ImageView con tamaño fijo y escala adaptable -->
+        <ImageView
+            android:id="@+id/toolbar_image"
+            android:layout_width="114dp"
+            android:layout_height="60dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/luquitalogocompleto"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"
+            app:cardBackgroundColor="@color/md_theme_tertiary"/>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+
     <!-- CardView contenedor para mostrar los datos -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -17,7 +38,7 @@
         app:cardCornerRadius="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/copiedText"
+        app:layout_constraintTop_toBottomOf="@id/toolbar3"
         app:layout_constraintVertical_bias="0.5">
 
         <!-- Contenedor de los campos y valores -->
