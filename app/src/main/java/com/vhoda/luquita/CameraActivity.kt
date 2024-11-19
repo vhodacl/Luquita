@@ -124,9 +124,23 @@ class CameraActivity : AppCompatActivity() {
         binding.apply {
             btnFlash.setOnClickListener { toggleFlash() }
             btnCancel.setOnClickListener { finish() }
-            recognizedTextView.visibility = View.GONE
+            btnResult.setOnClickListener {
+                val detectedText = recognizedTextView.text.toString()
+                if (detectedText.isNotEmpty()) {
+                    val bankData = parseBankData(detectedText)
+                    val intent = Intent(this@CameraActivity, ResultActivity::class.java).apply {
+                        putExtra(ResultActivity.EXTRA_DETECTED_TEXT, detectedText)
+                        putExtra("BANK_DATA", bankData.toMap().toString())
+                    }
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(this@CameraActivity, "No se ha detectado texto válido", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
+
 
     private fun checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(
@@ -216,16 +230,11 @@ class CameraActivity : AppCompatActivity() {
                             val detectedText = visionText.text.trim()
                             if (detectedText.isNotEmpty() && detectedText != lastProcessedText) {
                                 lastProcessedText = detectedText
-                                val bankData = parseBankData(detectedText)
 
-                                if (bankData.isValid() && !isTextDetected) {
-                                    isTextDetected = true
-                                    val intent = Intent(this@CameraActivity, ResultActivity::class.java)
-                                    intent.putExtra(ResultActivity.EXTRA_DETECTED_TEXT, detectedText)
-                                    intent.putExtra("BANK_DATA", bankData.toMap().toString())
-                                    startActivity(intent)
-                                    finish()
-                                }
+                                // Mostrar texto detectado y activar botón de resultado
+                                binding.recognizedTextView.text = detectedText
+                                binding.recognizedTextView.visibility = View.VISIBLE
+                                binding.btnResult.visibility = View.VISIBLE
                             }
                         }
                         .addOnFailureListener { e ->
@@ -246,10 +255,6 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    // Lista de bancos sin la palabra "banco"
-    private val bankNames = listOf(
-        "mercado pago", "scotiabank", "itau", "tenpo", "tapp", "copec", "mach", "falabella", "santander"
-    )
 
     private fun parseBankData(text: String): BankData {
         val bankData = BankData()
@@ -290,13 +295,25 @@ class CameraActivity : AppCompatActivity() {
                     }
                 }
 
+                // Lógica específica para Banco Estado
+                normalizedLine.contains("banco estado") ||
+                        normalizedLine.contains("cuenta rut") ||
+                        normalizedLine.contains("cta rut") -> {
+                    bankData.bank = "Banco Estado"
+                    bankData.accountType = when {
+                        normalizedLine.contains("cuenta rut") || normalizedLine.contains("cta rut") -> "Cuenta RUT"
+                        normalizedLine.contains("cuenta vista") -> "Cuenta Vista"
+                        else -> bankData.accountType
+                    }
+                }
+
                 // Detectar tipos de cuenta basados en palabras clave
                 normalizedLine.contains("cuenta") || normalizedLine.contains("cta") -> {
                     when {
                         normalizedLine.contains("rut") -> bankData.accountType = "Cuenta RUT"
                         normalizedLine.contains("vista") -> bankData.accountType = "Cuenta Vista"
                         normalizedLine.contains("corriente") -> bankData.accountType = "Cuenta Corriente"
-                        normalizedLine.contains("eletronica") -> bankData.accountType = "Chequera Electrónica"
+                        normalizedLine.contains("electronica") -> bankData.accountType = "Chequera Electrónica"
                         normalizedLine.contains("chequera") -> bankData.accountType = "Chequera Electrónica"
                         normalizedLine.contains("ahorro") -> bankData.accountType = "Cuenta de Ahorro"
                     }
@@ -334,6 +351,7 @@ class CameraActivity : AppCompatActivity() {
 
         return bankData
     }
+
 
     private fun ImageProxy.toBitmap(): Bitmap? {
         val yBuffer = planes[0].buffer

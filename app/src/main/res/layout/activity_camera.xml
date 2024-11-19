@@ -9,6 +9,14 @@
     android:transitionName="camera_button"
     tools:context=".CameraActivity">
 
+    <!-- Vista previa de la cámara -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/camera_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        app:implementationMode="performance" />
+
     <!-- TextView para texto reconocido -->
     <TextView
         android:id="@+id/recognizedTextView"
@@ -24,50 +32,20 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    <!-- Botón de información del banco -->
-    <Button
-        android:id="@+id/btnBankInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:background="@android:color/white"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="12dp"
-        android:text="Información del banco"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/buttons_layout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
-    <!-- Vista previa de la cámara -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/camera_preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        app:implementationMode="performance" />
 
-    <!-- Guía para la relación de aspecto 16:9 -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintGuide_percent="0.5" />
-
-    <!-- Contenedor de marco de escaneo con relación de aspecto 16:9 -->
+    <!-- Contenedor de marco de escaneo -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/scan_frame_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="25dp"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintDimensionRatio="H,4:3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintDimensionRatio="H,4:3">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Esquinas del marco de escaneo -->
+        <!-- Esquinas del marco de escaneo... -->
         <View
             android:id="@+id/corner_top_left"
             android:layout_width="40dp"
@@ -101,6 +79,24 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Botón de Resultado -->
+    <Button
+        android:id="@+id/btnResult"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/md_theme_primary"
+        android:padding="5dp"
+        android:text="Resultado"
+        android:textColor="@android:color/white"
+        android:visibility="gone"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toTopOf="@id/buttons_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <!-- Contenedor de botones -->
     <LinearLayout
         android:id="@+id/buttons_layout"
@@ -108,7 +104,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="96dp"
+        android:paddingVertical="32dp"
         android:gravity="center"
         android:weightSum="1"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -154,7 +150,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.4">
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btn_cancel"
                 android:layout_width="60dp"
