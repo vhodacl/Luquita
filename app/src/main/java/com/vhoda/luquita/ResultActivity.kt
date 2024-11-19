@@ -135,15 +135,15 @@ class ResultActivity : AppCompatActivity() {
     private fun setupUI(dataMap: Map<String, String>) {
         with(binding) {
             val fieldMappings = listOf(
-                Triple(companyNameTextView, companyNameTextView.parent as View, "Nombre"),
-                Triple(rutTextView, rutTextView.parent as View, "RUT"),
-                Triple(emailTextView, emailTextView.parent as View, "Correo"),
-                Triple(accountNumberTextView, accountNumberTextView.parent as View, "Número de Cuenta")
+                Triple(companyNameEditText, companyNameEditText.parent as View, "Nombre"),
+                Triple(rutEditText, rutEditText.parent as View, "RUT"),
+                Triple(emailEditText, emailEditText.parent as View, "Correo"),
+                Triple(accountNumberEditText, accountNumberEditText.parent as View, "Número de Cuenta")
             )
 
-            fieldMappings.forEach { (textView, parentView, key) ->
+            fieldMappings.forEach { (editText, parentView, key) ->
                 setupField(
-                    valueTextView = textView,
+                    valueTextView = editText,
                     parentView = parentView,
                     value = dataMap[key],
                     key = key
@@ -153,6 +153,10 @@ class ResultActivity : AppCompatActivity() {
             setupButtons(dataMap)
             configureBankLogo(dataMap)
         }
+    }
+
+    private fun setupField(valueTextView: EditText, parentView: View, value: String?, key: String) {
+        valueTextView.setText(value)
     }
 
     private fun configureBankLogo(dataMap: Map<String, String>) {
@@ -204,12 +208,12 @@ class ResultActivity : AppCompatActivity() {
     private fun getAllData(): String {
         with(binding) {
             return listOf(
-                companyNameTextView.text,
-                rutTextView.text,
-                emailTextView.text,
+                companyNameEditText.text.toString(),
+                rutEditText.text.toString(),
+                emailEditText.text.toString(),
                 bankSpinner.selectedItem.toString(),
                 accountTypeSpinner.selectedItem.toString(),
-                accountNumberTextView.text
+                accountNumberEditText.text.toString()
             ).joinToString("\n")
         }
     }

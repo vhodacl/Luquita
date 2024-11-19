@@ -74,15 +74,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp">
+                android:padding="4dp">
 
-                <TextView
-                    android:id="@+id/companyNameTextView"
+                <EditText
+                    android:id="@+id/companyNameEditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:hint="Nombre o Empresa" />
 
                 <!-- Icono de validación -->
                 <ImageView
@@ -103,14 +104,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp">
+                android:padding="4dp">
 
-                <TextView
-                    android:id="@+id/rutTextView"
+                <EditText
+                    android:id="@+id/rutEditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:hint="RUT" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -130,14 +132,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp">
+                android:padding="4dp">
 
-                <TextView
-                    android:id="@+id/emailTextView"
+                <EditText
+                    android:id="@+id/emailEditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:hint="Correo" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -157,7 +160,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp">
+                android:padding="7dp">
 
                 <Spinner
                     android:id="@+id/bankSpinner"
@@ -184,14 +187,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp">
+                android:padding="7dp">
 
                 <Spinner
                     android:id="@+id/accountTypeSpinner"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -211,14 +214,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp">
+                android:padding="4dp">
 
-                <TextView
-                    android:id="@+id/accountNumberTextView"
+                <EditText
+                    android:id="@+id/accountNumberEditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:hint="Número de Cuenta" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -226,6 +230,7 @@
                     android:src="@drawable/task_alt"
                     android:tint="#4CAF50" />
             </LinearLayout>
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
