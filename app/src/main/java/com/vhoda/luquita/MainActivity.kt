@@ -19,6 +19,9 @@ import com.vhoda.luquita.databinding.ActivityMainBinding
 import android.app.AlertDialog
 import android.view.LayoutInflater
 import java.io.IOException
+import android.os.Build
+import android.view.View
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,6 +40,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Barra de estado transparente
+            window.statusBarColor = resources.getColor(android.R.color.transparent, theme)
+            // Barra de navegación transparente
+            window.navigationBarColor = resources.getColor(android.R.color.transparent, theme)
+
+            // Combinar todos los flags
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or // Texto oscuro en la barra de estado
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or // Contenido bajo la barra de navegación
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE // Mantener un diseño estable
+        }
 
         initLoadingDialog()
         checkPermissions()

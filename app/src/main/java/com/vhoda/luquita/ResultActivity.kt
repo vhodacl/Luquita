@@ -12,6 +12,7 @@ import com.vhoda.luquita.databinding.ActivityResultBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import android.os.Build
 
 class ResultActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResultBinding
@@ -60,6 +61,16 @@ class ResultActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Configurar las barras de estado y navegación
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.statusBarColor = resources.getColor(android.R.color.transparent, theme)
+            window.navigationBarColor = resources.getColor(android.R.color.transparent, theme)
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        }
+
         binding = ActivityResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -81,6 +92,8 @@ class ResultActivity : AppCompatActivity() {
             return
         }
 
+        binding = ActivityResultBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         // Configurar la UI con los datos parseados
         setupUI(dataMap)
         setupSpinners(dataMap)

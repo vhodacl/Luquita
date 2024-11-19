@@ -5,14 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
-    tools:context=".ResultActivity">
+    tools:context=".ResultActivity"
+    android:fitsSystemWindows="true">
+
+    <!-- AppBar con imagen centrada -->
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar3"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        android:textAlignment="center"
+
+        android:elevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:titleCentered="true">
 
         <!-- ImageView con tamaño fijo y escala adaptable -->
@@ -20,15 +27,13 @@
             android:id="@+id/toolbar_image"
             android:layout_width="114dp"
             android:layout_height="60dp"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/luquitalogocompleto"
-            android:scaleType="fitCenter"
             android:layout_gravity="center"
-            app:cardBackgroundColor="@color/md_theme_tertiary"/>
+            android:contentDescription="@string/app_name"
+            android:scaleType="fitCenter"
+            android:src="@drawable/luquitalogocompleto"
+            app:cardBackgroundColor="@color/md_theme_tertiary" />
     </com.google.android.material.appbar.MaterialToolbar>
 
-
-    <!-- CardView contenedor para mostrar los datos -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="0dp"
@@ -360,13 +365,14 @@
         android:id="@+id/doneButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/rounded_button"
-        android:padding="8dp"
         android:text="Listo"
         android:textStyle="bold"
         android:textSize="16sp"
+        app:cornerRadius="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
