@@ -25,7 +25,6 @@ import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import android.graphics.Color
 
-
 class CheckInImageActivity : AppCompatActivity() {
     private val recognizer by lazy { TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS) }
 
@@ -40,11 +39,7 @@ class CheckInImageActivity : AppCompatActivity() {
     private var currentImageUri: Uri? = null
     private var isAdjustingFrame = true
 
-    // Variables para el manejo del marco de escaneo
-    private var activeCorner: View? = null
-    private var initialTouchX: Float = 0f
-    private var initialTouchY: Float = 0f
-    private var corners: List<View> = emptyList()
+    private var detectedText: String = ""  // Variable para almacenar el texto detectado
 
     companion object {
         private const val TAG = "CheckInImageActivity"
@@ -57,9 +52,8 @@ class CheckInImageActivity : AppCompatActivity() {
 
         initializeViews()
         handleIncomingImage() // Procesa automáticamente al cargar la imagen.
-        btnFinalizar.setOnClickListener { finish() } // Botón para finalizar la actividad.
+        btnFinalizar.setOnClickListener { finishAndSendResults() } // Botón para finalizar la actividad y enviar los datos
     }
-
 
     private fun initializeViews() {
         progressBar = findViewById(R.id.progressBar)
@@ -71,59 +65,6 @@ class CheckInImageActivity : AppCompatActivity() {
         btnFinalizar = findViewById(R.id.btn_finalizar)
         cardView = findViewById(R.id.card_view)
         scanFrameContainer = findViewById(R.id.scan_frame_container)
-    }
-
-    private fun setupScanFrame() {
-        corners = listOf(
-            R.id.corner_top_left,
-            R.id.corner_top_right,
-            R.id.corner_bottom_left,
-            R.id.corner_bottom_right
-        ).map { findViewById(it) }
-
-        corners.forEach { corner ->
-            corner.setOnTouchListener { view, event ->
-                handleCornerTouch(view, event)
-            }
-        }
-    }
-
-    private fun handleCornerTouch(view: View, event: MotionEvent): Boolean {
-        if (!isAdjustingFrame) return false
-
-        return when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                activeCorner = view
-                initialTouchX = event.rawX
-                initialTouchY = event.rawY
-                true
-            }
-            MotionEvent.ACTION_MOVE -> {
-                if (activeCorner == view) {
-                    val deltaX = event.rawX - initialTouchX
-                    val deltaY = event.rawY - initialTouchY
-                    updateCornerPosition(view, deltaX, deltaY)
-                    initialTouchX = event.rawX
-                    initialTouchY = event.rawY
-                    true
-                } else false
-            }
-            MotionEvent.ACTION_UP -> {
-                activeCorner = null
-                true
-            }
-            else -> false
-        }
-    }
-
-    private fun setupButtons() {
-        btnFinalizar.setOnClickListener {
-            if (isAdjustingFrame) {
-                processImageWithFrame()
-            } else {
-                finish()
-            }
-        }
     }
 
     private fun handleIncomingImage() {
@@ -141,56 +82,6 @@ class CheckInImageActivity : AppCompatActivity() {
                 showError("Error al cargar la imagen")
             }
         } ?: showError("No se recibió la imagen")
-    }
-
-
-    private fun updateCornerPosition(corner: View, deltaX: Float, deltaY: Float) {
-        val layoutParams = corner.layoutParams as ConstraintLayout.LayoutParams
-        val maxMarginHorizontal = scanFrameContainer.width - corner.width
-        val maxMarginVertical = scanFrameContainer.height - corner.height
-
-        when (corner.id) {
-            R.id.corner_top_left -> {
-                layoutParams.leftMargin = (layoutParams.leftMargin + deltaX.toInt())
-                    .coerceIn(MIN_MARGIN, maxMarginHorizontal)
-                layoutParams.topMargin = (layoutParams.topMargin + deltaY.toInt())
-                    .coerceIn(MIN_MARGIN, maxMarginVertical)
-            }
-            R.id.corner_top_right -> {
-                layoutParams.rightMargin = (layoutParams.rightMargin - deltaX.toInt())
-                    .coerceIn(MIN_MARGIN, maxMarginHorizontal)
-                layoutParams.topMargin = (layoutParams.topMargin + deltaY.toInt())
-                    .coerceIn(MIN_MARGIN, maxMarginVertical)
-            }
-            R.id.corner_bottom_left -> {
-                layoutParams.leftMargin = (layoutParams.leftMargin + deltaX.toInt())
-                    .coerceIn(MIN_MARGIN, maxMarginHorizontal)
-                layoutParams.bottomMargin = (layoutParams.bottomMargin - deltaY.toInt())
-                    .coerceIn(MIN_MARGIN, maxMarginVertical)
-            }
-            R.id.corner_bottom_right -> {
-                layoutParams.rightMargin = (layoutParams.rightMargin - deltaX.toInt())
-                    .coerceIn(MIN_MARGIN, maxMarginHorizontal)
-                layoutParams.bottomMargin = (layoutParams.bottomMargin - deltaY.toInt())
-                    .coerceIn(MIN_MARGIN, maxMarginVertical)
-            }
-        }
-
-        corner.layoutParams = layoutParams
-    }
-
-    private fun toggleScanMode(showScanFrame: Boolean) {
-        scanFrameContainer.isVisible = showScanFrame
-        cardView.isVisible = !showScanFrame
-        btnFinalizar.text = if (showScanFrame) "Procesar" else "Finalizar"
-        isAdjustingFrame = showScanFrame
-    }
-
-    private fun processImageWithFrame() {
-        currentImageUri?.let { uri ->
-            toggleScanMode(false)
-            processImage(uri)
-        }
     }
 
     private fun displayImage(uri: Uri) {
@@ -215,9 +106,6 @@ class CheckInImageActivity : AppCompatActivity() {
         isProcessing = true
         showProgress(true)
 
-        // Eliminar el mensaje "Procesando imagen..."
-        // messageTextView.text = "Procesando imagen..." // Ya no es necesario
-
         try {
             val bitmap = getBitmapFromUri(imageUri) ?: throw IOException("No se pudo crear el bitmap")
             val image = InputImage.fromBitmap(bitmap, 0)
@@ -225,31 +113,24 @@ class CheckInImageActivity : AppCompatActivity() {
             recognizer.process(image)
                 .addOnSuccessListener { visionText ->
                     val recognizedText = visionText.text
-                    Log.d(TAG, "Texto reconocido: $recognizedText") // Agregar log para ver lo que se reconoce
+                    Log.d(TAG, "Texto reconocido: $recognizedText")
 
-                    // Verificar si el texto reconocido no está vacío
-                    val detectedText = if (recognizedText.isNotEmpty()) {
+                    detectedText = if (recognizedText.isNotEmpty()) {
                         recognizedText
                     } else {
                         "No se detectó texto en la imagen"
                     }
 
-                    // Agregar un log para verificar el texto antes de actualizar el TextView
-                    Log.d(TAG, "Texto detectado: $detectedText")
-
-                    // Actualizar el TextView con el texto detectado
                     val tvDetectedText = findViewById<TextView>(R.id.tv_detected_text)
                     tvDetectedText.text = detectedText
 
-                    // Asegurarse de que el título "Texto Detectado" sea visible
                     val tvCheckinMessage = findViewById<TextView>(R.id.tv_checkin_message)
-                    tvCheckinMessage.visibility = View.VISIBLE  // Hacer visible el título
+                    tvCheckinMessage.visibility = View.VISIBLE
 
-                    // Mostrar la imagen procesada
                     val ivProcessedImage = findViewById<ImageView>(R.id.iv_processed_image)
-                    ivProcessedImage.setImageBitmap(bitmap) // Muestra la imagen procesada
+                    ivProcessedImage.setImageBitmap(bitmap)
 
-                    toggleScanMode(false) // Mostrar el CardView con resultados.
+                    toggleScanMode(false)
                 }
                 .addOnFailureListener { e ->
                     Log.e(TAG, "Error en OCR: ${e.message}")
@@ -269,6 +150,15 @@ class CheckInImageActivity : AppCompatActivity() {
         }
     }
 
+    private fun finishAndSendResults() {
+        val intent = Intent(this, ResultActivity::class.java)
+        intent.putExtra("detected_text", detectedText)
+        currentImageUri?.let {
+            intent.putExtra("image_uri", it.toString())
+        }
+        startActivity(intent)
+        finish()
+    }
 
     private fun getBitmapFromUri(uri: Uri): Bitmap? {
         return try {
@@ -294,5 +184,12 @@ class CheckInImageActivity : AppCompatActivity() {
     private fun showError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         Log.e(TAG, message)
+    }
+
+    private fun toggleScanMode(showScanFrame: Boolean) {
+        scanFrameContainer.isVisible = showScanFrame
+        cardView.isVisible = !showScanFrame
+        btnFinalizar.text = if (showScanFrame) "Procesar" else "Finalizar"
+        isAdjustingFrame = showScanFrame
     }
 }
