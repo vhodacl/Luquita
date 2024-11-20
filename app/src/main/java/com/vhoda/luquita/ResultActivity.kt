@@ -62,7 +62,10 @@ class ResultActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Configurar las barras de estado y navegación
+        // Verificar si la actividad anterior fue CheckInImageActivity
+        val fromCheckInImage = intent.getBooleanExtra("FROM_CHECKINIMAGE", false)
+
+        // Configurar las barras de estado y navegación (sin cambios)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = resources.getColor(android.R.color.transparent, theme)
             window.navigationBarColor = resources.getColor(android.R.color.transparent, theme)
@@ -85,19 +88,18 @@ class ResultActivity : AppCompatActivity() {
             parseDetectedData(detectedText)
         }
 
-        // Si los datos no son válidos, volvemos a la cámara
-        if (!isDataValid(dataMap)) {
+        // Si los datos no son válidos y no proviene de CheckInImageActivity, volvemos a la cámara
+        if (!isDataValid(dataMap) && !fromCheckInImage) {
             startActivity(Intent(this, CameraActivity::class.java))
             finish()
             return
         }
 
-        binding = ActivityResultBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        // Configurar la UI con los datos parseados
+        // Si los datos son válidos, continuar con la configuración de la UI
         setupUI(dataMap)
         setupSpinners(dataMap)
     }
+
 
     private fun setupSpinners(dataMap: Map<String, String>) {
         // Configurar Spinner de Bancos

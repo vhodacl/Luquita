@@ -28,8 +28,15 @@
             </intent-filter>
         </activity>
 
+        <!-- Activity CameraActivity (asegúrate de que no se esté abriendo innecesariamente) -->
         <activity android:name=".CameraActivity" />
-        <activity android:name=".CheckInImageActivity" />
+
+        <!-- CheckInImageActivity debe ser configurada para no ser iniciada más de una vez -->
+        <activity
+            android:name=".CheckInImageActivity"
+            android:launchMode="singleTop" />  <!-- Añadir singleTop o singleTask para evitar múltiples instancias -->
+
+        <!-- ResultActivity (fin de flujo) -->
         <activity android:name=".ResultActivity" />
 
         <!-- Actividad de bienvenida (WelcomeActivity), actualmente inactiva -->
