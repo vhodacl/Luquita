@@ -3,272 +3,193 @@ package com.vhoda.luquita
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.vhoda.luquita.databinding.ActivityMainBinding
-import android.app.AlertDialog
-import android.view.LayoutInflater
-import java.io.IOException
-import android.os.Build
-import android.view.View
-
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val PICK_IMAGE = 101
-    private val TAKE_PHOTO = 102
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-    private lateinit var loadingDialog: AlertDialog
-    private val REQUIRED_PERMISSIONS = arrayOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.CAMERA
-    )
+    private val REQUIRED_PERMISSIONS = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+    } else {
+        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
     private val REQUEST_CODE = 123
+
+    companion object {
+        private const val TAG = "MainActivity"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate called")
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Barra de estado transparente
-            window.statusBarColor = resources.getColor(android.R.color.transparent, theme)
-            // Barra de navegación transparente
-            window.navigationBarColor = resources.getColor(android.R.color.transparent, theme)
-
-            // Combinar todos los flags
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or // Texto oscuro en la barra de estado
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or // Contenido bajo la barra de navegación
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE // Mantener un diseño estable
-        }
-
-        initLoadingDialog()
+        setupTransparentBars()
         checkPermissions()
         setupClickListeners()
     }
 
-    private fun initLoadingDialog() {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_loading, null)
-        loadingDialog = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .setCancelable(false)
-            .create()
+    private fun setupTransparentBars() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.statusBarColor = resources.getColor(android.R.color.transparent, theme)
+            window.navigationBarColor = resources.getColor(android.R.color.transparent, theme)
+
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        }
     }
 
     private fun setupClickListeners() {
         binding.gallery.setOnClickListener {
-            // Remove permission check for gallery
-            openGallery()
+            Log.d(TAG, "Gallery button clicked")
+            if (hasStoragePermission()) {
+                openGallery()
+            } else {
+                Log.d(TAG, "Requesting permissions")
+                checkPermissions()
+            }
         }
 
         binding.camera.setOnClickListener {
-            if (hasCameraPermission()) {
-                openCamera()
-            } else {
-                requestPermissions()
-            }
+            val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
         }
     }
 
     private fun openGallery() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, PICK_IMAGE)
-    }
-    private fun openCamera() {
-        val intent = Intent(this, CameraActivity::class.java)
-        startActivityForResult(intent, TAKE_PHOTO)
-    }
-
-    private fun checkPermissions() {
-        if (!hasRequiredPermissions()) {
-            requestPermissions()
+        Log.d(TAG, "Opening gallery")
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        }
+        try {
+            startActivityForResult(intent, PICK_IMAGE)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error opening gallery: ${e.message}")
+            Toast.makeText(this, "Error al abrir la galería", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun hasRequiredPermissions(): Boolean {
-        return REQUIRED_PERMISSIONS.all {
-            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+    private fun checkPermissions() {
+        Log.d(TAG, "Checking permissions")
+        if (!hasStoragePermission()) {
+            Log.d(TAG, "Requesting permissions")
+            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE)
+        } else {
+            Log.d(TAG, "Permissions already granted")
         }
     }
 
     private fun hasStoragePermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
+        val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_MEDIA_IMAGES
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+        Log.d(TAG, "Has storage permission: $hasPermission")
+        return hasPermission
     }
 
-    private fun hasCameraPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestPermissions() {
-        ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE)
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.d(TAG, "onRequestPermissionsResult: requestCode=$requestCode")
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Permission granted")
+                openGallery()
+            } else {
+                Log.d(TAG, "Permission denied")
+                Toast.makeText(
+                    this,
+                    "Se necesitan permisos para acceder a la galería",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.d(TAG, "onActivityResult: requestCode=$requestCode, resultCode=$resultCode")
 
-        if (resultCode == RESULT_OK && data != null) {
-            when (requestCode) {
-                PICK_IMAGE -> handleGalleryResult(data)
-                TAKE_PHOTO -> handleCameraResult(data)
-            }
-        }
-    }
+        if (requestCode == PICK_IMAGE) {
+            if (resultCode == RESULT_OK) {
+                val imageUri: Uri? = data?.data
+                Log.d(TAG, "Selected image URI: $imageUri")
 
-    private fun handleGalleryResult(data: Intent) {
-        try {
-            val imageUri: Uri? = data.data
-            if (imageUri != null) {
-                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
-                processImage(bitmap)
-            } else {
-                showError("No se pudo obtener la imagen")
-            }
-        } catch (e: IOException) {
-            Log.e("OCR", "Error al cargar la imagen: ${e.message}")
-            showError("Error al cargar la imagen")
-        }
-    }
-
-    private fun handleCameraResult(data: Intent) {
-        val bitmap = data.getParcelableExtra<Bitmap>("photo")
-        if (bitmap != null) {
-            processImage(bitmap)
-        } else {
-            showError("No se pudo obtener la foto")
-        }
-    }
-
-    private fun processImage(bitmap: Bitmap) {
-        try {
-            showLoading()
-            val image = InputImage.fromBitmap(bitmap, 0)
-
-            recognizer.process(image)
-                .addOnSuccessListener { visionText ->
+                if (imageUri != null) {
                     try {
-                        hideLoading()
-                        val recognizedText = visionText.text
-                        Log.d("OCR", "Texto reconocido: $recognizedText")
+                        // Verificar que la URI es válida
+                        contentResolver.getType(imageUri)?.let { mimeType ->
+                            Log.d(TAG, "Image mime type: $mimeType")
 
-                        val bankData = BankDataParser.parse(recognizedText)
-                        Log.d("OCR", "Datos bancarios: ${bankData.toMap()}")
+                            // Tomar permisos persistentes
+                            val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            contentResolver.takePersistableUriPermission(imageUri, takeFlags)
 
-                        if (bankData.isValid()) {
-                            showResults(recognizedText, bankData)
-                        } else {
-                            showMissingFieldsError(bankData)
+                            // Navegar a CheckInImageActivity
+                            Log.d(TAG, "Navigating to CheckInImageActivity")
+                            navigateToCheckInImage(imageUri)
+                        } ?: run {
+                            Log.e(TAG, "Invalid image URI - null mime type")
+                            Toast.makeText(this, "Imagen no válida", Toast.LENGTH_SHORT).show()
                         }
+                    } catch (e: SecurityException) {
+                        Log.e(TAG, "Security error: ${e.message}")
+                        // Intentar navegar sin permisos persistentes
+                        navigateToCheckInImage(imageUri)
                     } catch (e: Exception) {
-                        Log.e("OCR", "Error al procesar datos: ${e.message}")
-                        showError("Error al procesar los datos")
+                        Log.e(TAG, "Unexpected error: ${e.message}")
+                        Toast.makeText(this, "Error al procesar la imagen", Toast.LENGTH_SHORT).show()
                     }
+                } else {
+                    Log.e(TAG, "Null image URI")
+                    Toast.makeText(this, "No se pudo obtener la imagen", Toast.LENGTH_SHORT).show()
                 }
-                .addOnFailureListener { e ->
-                    Log.e("OCR", "Error en OCR: ${e.message}")
-                    hideLoading()
-                    showError("Error al procesar la imagen")
-                }
+            } else {
+                Log.d(TAG, "Image selection cancelled or failed")
+                Toast.makeText(this, "Selección de imagen cancelada", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun navigateToCheckInImage(imageUri: Uri) {
+        Log.d(TAG, "Creating intent for CheckInImageActivity")
+        val intent = Intent(this, CheckInImageActivity::class.java).apply {
+            putExtra("image_uri", imageUri.toString())
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            Log.d(TAG, "Starting CheckInImageActivity")
+            startActivity(intent)
         } catch (e: Exception) {
-            Log.e("OCR", "Error al iniciar proceso: ${e.message}")
-            hideLoading()
-            showError("Error al iniciar el proceso")
+            Log.e(TAG, "Error starting CheckInImageActivity: ${e.message}")
+            Toast.makeText(this, "Error al abrir el procesador de imágenes", Toast.LENGTH_LONG).show()
         }
     }
-
-    private fun showResults(recognizedText: String, bankData: BankData) {
-        val intent = Intent(this, ResultActivity::class.java).apply {
-            putExtra(ResultActivity.EXTRA_DETECTED_TEXT, recognizedText)
-            putExtra(ResultActivity.EXTRA_BANK_DATA, bankData.toMap().toString())
-        }
-        startActivity(intent)
-    }
-
-    private fun showMissingFieldsError(bankData: BankData) {
-        val missingFields = getMissingFields(bankData)
-        Toast.makeText(
-            this,
-            "Faltan datos requeridos: $missingFields",
-            Toast.LENGTH_LONG
-        ).show()
-    }
-
-    private fun showLoading() {
-        if (!loadingDialog.isShowing) {
-            loadingDialog.show()
-        }
-    }
-
-    private fun hideLoading() {
-        if (loadingDialog.isShowing) {
-            loadingDialog.dismiss()
-        }
-    }
-
-    private fun showError(message: String) {
-        hideLoading()
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun getMissingFields(bankData: BankData): String {
-        return buildList {
-            if (bankData.rut == null) add("RUT")
-            if (bankData.accountNumber == null) add("Número de cuenta")
-            if (bankData.bank == null) add("Banco")
-            if (bankData.accountType == null) add("Tipo de cuenta")
-        }.joinToString(", ")
-    }
-}
-
-// BankData.kt
-data class BankData(
-    var rut: String? = null,
-    var email: String? = null,
-    var bank: String? = null,
-    var accountType: String? = null,
-    var accountNumber: String? = null,
-    var companyName: String? = null
-) {
-    fun isValid(): Boolean {
-        var validFields = 0
-        if (!rut.isNullOrBlank() && isValidRut(rut!!)) validFields++
-        if (!accountNumber.isNullOrBlank()) validFields++
-        if (!bank.isNullOrBlank()) validFields++
-        if (!accountType.isNullOrBlank()) validFields++
-        if (!email.isNullOrBlank() && isValidEmail(email!!)) validFields++
-        return validFields >= 3
-    }
-
-    private fun isValidRut(rut: String): Boolean {
-        return rut.matches(Regex("\\d{1,2}\\.?\\d{3}\\.?\\d{3}-[\\dkK]"))
-    }
-
-    private fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-
-    fun toMap(): Map<String, String> = mapOf(
-        "RUT" to (rut ?: ""),
-        "Email" to (email ?: ""),
-        "Banco" to (bank ?: ""),
-        "Tipo de Cuenta" to (accountType ?: ""),
-        "Número de Cuenta" to (accountNumber ?: ""),
-        "Nombre Empresa" to (companyName ?: "")
-    )
 }

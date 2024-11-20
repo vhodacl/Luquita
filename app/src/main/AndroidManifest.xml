@@ -3,6 +3,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <!-- La cámara no es un requerimiento obligatorio -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -28,6 +29,7 @@
         </activity>
 
         <activity android:name=".CameraActivity" />
+        <activity android:name=".CheckInImageActivity" />
         <activity android:name=".ResultActivity" />
 
         <!-- Actividad de bienvenida (WelcomeActivity), actualmente inactiva -->
