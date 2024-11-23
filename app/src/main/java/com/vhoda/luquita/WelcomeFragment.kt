@@ -15,8 +15,7 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
 
         val btnNext: Button = view.findViewById(R.id.btnNext)
         btnNext.setOnClickListener {
-            // Navegar al siguiente fragmento
-            (activity as WelcomeActivity).findViewById<ViewPager2>(R.id.viewPager).currentItem = 1
+            (activity as? WelcomeActivity)?.nextPage()
         }
     }
 }

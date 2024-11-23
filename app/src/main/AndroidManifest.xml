@@ -21,6 +21,7 @@
             android:label="Luquita"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme"
+            android:launchMode="singleTask"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,7 +43,8 @@
         <!-- Actividad de bienvenida (WelcomeActivity), actualmente inactiva -->
         <activity
             android:name=".WelcomeActivity"
-            android:exported="true"
+            android:exported="false"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
     </application>

@@ -32,13 +32,27 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate called")
+        Log.d(TAG, "MainActivity onCreate")
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val isFirstTime = isFirstTime()
+        Log.d(TAG, "Is first time: $isFirstTime")
+
+        if (isFirstTime) {
+            val intent = Intent(this, WelcomeActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+
         setupTransparentBars()
-        checkPermissions()
         setupClickListeners()
+    }
+
+    private fun isFirstTime(): Boolean {
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        return prefs.getBoolean("is_first_time", true)
     }
 
     private fun setupTransparentBars() {
@@ -58,8 +72,7 @@ class MainActivity : AppCompatActivity() {
             if (hasStoragePermission()) {
                 openGallery()
             } else {
-                Log.d(TAG, "Requesting permissions")
-                checkPermissions()
+                requestStoragePermission()
             }
         }
 
@@ -85,14 +98,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkPermissions() {
-        Log.d(TAG, "Checking permissions")
-        if (!hasStoragePermission()) {
-            Log.d(TAG, "Requesting permissions")
-            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE)
-        } else {
-            Log.d(TAG, "Permissions already granted")
+    private fun requestStoragePermission() {
+        if (shouldShowRequestPermissionRationale(REQUIRED_PERMISSIONS[0])) {
+            Toast.makeText(
+                this,
+                "Necesitamos acceso a la galería para seleccionar imágenes",
+                Toast.LENGTH_LONG
+            ).show()
         }
+        ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE)
     }
 
     private fun hasStoragePermission(): Boolean {
