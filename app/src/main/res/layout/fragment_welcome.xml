@@ -11,8 +11,7 @@
         android:layout_height="wrap_content"
         android:text="¡Bienvenido a Luquita!"
         android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/md_theme_brownie" />
+        android:textStyle="bold"/>
 
     <Button
         android:id="@+id/btnNext"

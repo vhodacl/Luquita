@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/md_theme_onPrimary"
+    android:background="@color/md_theme_background"
     tools:context=".ResultActivity"
     android:fitsSystemWindows="true">
 
@@ -39,7 +39,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="35dp"
-        app:cardBackgroundColor="@color/md_theme_tertiary"
+        app:cardBackgroundColor="@color/md_theme_surfaceContainer"
         app:cardCornerRadius="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -275,9 +275,8 @@
         app:cardElevation="0dp"
         android:clickable="true"
         android:focusable="true"
-        app:cardBackgroundColor="@color/md_theme_tertiary"
+            app:cardBackgroundColor="@color/md_theme_surfaceContainer"
         app:strokeWidth="1dp"
-        app:strokeColor="#ebe9e7"
         android:layout_weight="1">
 
         <LinearLayout
@@ -290,8 +289,8 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="18dp"
-            android:src="@drawable/share"
-            app:tint="@color/md_theme_brownie" />
+                app:tint="@color/md_theme_onBackground"
+            android:src="@drawable/share"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -299,7 +298,6 @@
                 android:layout_marginTop="0dp"
                 android:text="Compartir"
                 android:textStyle="bold"
-                android:textColor="@color/md_theme_brownie"
                 android:textSize="12sp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -314,9 +312,8 @@
     app:cardElevation="0dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardBackgroundColor="@color/md_theme_tertiary"
+        app:cardBackgroundColor="@color/md_theme_surfaceContainer"
     app:strokeWidth="1dp"
-    app:strokeColor="#ebe9e7"
     android:layout_weight="1">
     <LinearLayout
         android:layout_width="match_parent"
@@ -328,8 +325,8 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="18dp"
-        android:src="@drawable/copy"
-        app:tint="@color/md_theme_brownie" />
+            app:tint="@color/md_theme_onBackground"
+        android:src="@drawable/copy" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -337,7 +334,6 @@
             android:layout_marginTop="0dp"
             android:text="Copiar"
             android:textStyle="bold"
-            android:textColor="@color/md_theme_brownie"
             android:textSize="12sp" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
@@ -366,6 +362,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
+        app:cardBackgroundColor="@color/md_theme_tertiary"
         android:layout_marginBottom="20dp"
         android:background="@drawable/rounded_button"
         android:text="Listo"

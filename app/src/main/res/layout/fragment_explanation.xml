@@ -9,8 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Luquita es una APP donde podrás escanear desde la cámara o una foto para pagar rápidamente."
-        android:textSize="18sp"
-        android:textColor="@color/md_theme_brownie" />
+        android:textSize="18sp"/>
 
     <Button
         android:id="@+id/btnNext"

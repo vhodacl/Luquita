@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/md_theme_onPrimary"
+    android:background="@color/md_theme_background"
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -40,7 +40,7 @@
             android:layout_marginHorizontal="26dp"
             android:layout_marginTop="140dp"
             app:cardCornerRadius="26dp"
-            app:cardBackgroundColor="@color/md_theme_tertiary"
+            app:cardBackgroundColor="@color/md_theme_surfaceContainer"
             android:clickable="true"
             android:focusable="true">
 
@@ -57,7 +57,6 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Luquita está en fase Alpha, Donde algunas funciones no están pulidas y requiere Pruebas y Feedback"
-                    android:textColor="@color/md_theme_muted"
                     android:textSize="14sp"/>
             </LinearLayout>
 
@@ -82,11 +81,10 @@
                 android:layout_margin="3dp"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/md_theme_surfaceContainer"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardBackgroundColor="@color/md_theme_tertiary"
-                app:strokeWidth="1dp"
-                app:strokeColor="#ebe9e7">
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -98,16 +96,16 @@
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="25dp"
-                        android:src="@drawable/image"
-                        app:tint="@color/md_theme_brownie" />
+                        android:textColor="@color/md_theme_onBackground"
+                        android:src="@drawable/image"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="0dp"
                         android:text="Galería"
+                        android:textColor="@color/md_theme_onBackground"
                         android:textStyle="bold"
-                        android:textColor="@color/md_theme_brownie"
                         android:textSize="13sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -123,9 +121,8 @@
                 app:cardElevation="0dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardBackgroundColor="@color/md_theme_tertiary"
-                app:strokeWidth="1dp"
-                app:strokeColor="#ebe9e7">
+                app:cardBackgroundColor="@color/md_theme_surfaceContainer"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -137,16 +134,16 @@
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="25dp"
-                        android:src="@drawable/camera"
-                        app:tint="@color/md_theme_brownie" />
+                        android:textColor="@color/md_theme_onBackground"
+                        android:src="@drawable/camera"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="0dp"
                         android:text="Cámara"
+                        android:textColor="@color/md_theme_onBackground"
                         android:textStyle="bold"
-                        android:textColor="@color/md_theme_brownie"
                         android:textSize="13sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

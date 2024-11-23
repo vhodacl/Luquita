@@ -9,8 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No recopilaremos archivos de tu dispositivo. Solo usaremos permisos necesarios como la galería y la cámara."
-        android:textSize="16sp"
-        android:textColor="@color/md_theme_brownie" />
+        android:textSize="16sp"/>
 
     <Button
         android:id="@+id/btnNext"
