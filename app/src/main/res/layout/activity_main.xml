@@ -1,179 +1,29 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/md_theme_background"
-    android:fitsSystemWindows="true">
+    android:background="@color/md_theme_background">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar3"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        android:textAlignment="center"
-        app:titleCentered="true">
+    <ImageView
+        android:id="@+id/splashLogo"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/luquitalogocompleto"
+        android:contentDescription="@string/app_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-        <ImageView
-            android:id="@+id/toolbar_image"
-            android:layout_width="114dp"
-            android:layout_height="60dp"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/luquitalogocompleto"
-            android:scaleType="fitCenter"
-            android:layout_gravity="center"/>
+    <ProgressBar
+        android:id="@+id/splashProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@id/splashLogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-        <ImageButton
-            android:id="@+id/more_options"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="10dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Más opciones"
-            android:padding="1dp"
-            android:src="@drawable/more"
-            app:tint="@color/md_theme_onBackground"/>
-
-    </com.google.android.material.appbar.MaterialToolbar>
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize">
-
-        <!-- Card Simple sin ImageView -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardSimple"
-            android:layout_width="match_parent"
-            android:layout_height="230dp"
-            android:layout_marginHorizontal="26dp"
-            android:layout_marginTop="140dp"
-            app:cardCornerRadius="26dp"
-            app:cardBackgroundColor="@color/md_theme_surfaceContainer"
-            android:clickable="true"
-            android:focusable="true">
-
-            <!-- Aquí puedes agregar el contenido que desees dentro de la tarjeta -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="22dp">
-
-                <TextView
-                    android:id="@+id/textCardContent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:text="Luquita está en fase Alpha, Donde algunas funciones no están pulidas y requiere Pruebas y Feedback"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Botones para galería y cámara -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:padding="16dp"
-            android:layout_alignParentBottom="true"
-            android:spacing="16dp">
-
-            <!-- Botón Galería -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/gallery"
-                android:layout_width="0dp"
-                android:layout_height="75dp"
-                android:layout_weight="1"
-                android:layout_margin="3dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/md_theme_surfaceContainer"
-                android:clickable="true"
-                android:focusable="true"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/image"
-                        android:textColor="@color/md_theme_onBackground" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="0dp"
-                        android:text="Galería"
-                        android:textColor="@color/md_theme_onBackground"
-                        android:textStyle="bold"
-                        android:textSize="13sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Botón Cámara -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/camera"
-                android:layout_width="0dp"
-                android:layout_height="75dp"
-                android:layout_weight="1"
-                android:layout_margin="3dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="0dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardBackgroundColor="@color/md_theme_surfaceContainer"
-                app:strokeWidth="1dp"
-                android:transitionName="camera_transition">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="25dp"
-                        android:textColor="@color/md_theme_onBackground"
-                        android:src="@drawable/camera"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="0dp"
-                        android:text="Cámara"
-                        android:textColor="@color/md_theme_onBackground"
-                        android:textStyle="bold"
-                        android:textSize="13sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
-        <!-- Botón Listo -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/doneButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:background="@drawable/rounded_button"
-            android:padding="8dp"
-            android:text="Pegar y Normalizar"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-    </RelativeLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

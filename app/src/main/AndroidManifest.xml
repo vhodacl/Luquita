@@ -45,5 +45,10 @@
             android:exported="true"
              android:theme="@style/AppTheme">
         </activity>
+
+        <!-- Inicio -->
+        <activity
+            android:name=".Inicio"
+            android:exported="false"/>
     </application>
 </manifest>
