@@ -10,9 +10,17 @@ import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.viewpager2.widget.ViewPager2
+import android.os.Build
 
 class PermissionsFragment : Fragment(R.layout.fragment_permissions) {
     private var cameraPermissionGranted = false
+    private var galleryPermissionGranted = false
+
+    private val galleryPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        android.Manifest.permission.READ_MEDIA_IMAGES
+    } else {
+        android.Manifest.permission.READ_EXTERNAL_STORAGE
+    }
 
     private fun getViewPager() = (activity as? WelcomeActivity)?.findViewById<ViewPager2>(R.id.viewPager)
 
@@ -27,11 +35,32 @@ class PermissionsFragment : Fragment(R.layout.fragment_permissions) {
                 "Permiso de cámara concedido",
                 Toast.LENGTH_SHORT
             ).show()
-            navigateToFinal()
+            checkAndNavigate()
         } else {
             Toast.makeText(
                 requireContext(),
                 "Permiso de cámara denegado",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private val requestGalleryPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        galleryPermissionGranted = isGranted
+        if (isGranted) {
+            saveGalleryPermissionGranted()
+            Toast.makeText(
+                requireContext(),
+                "Permiso de galería concedido",
+                Toast.LENGTH_SHORT
+            ).show()
+            checkAndNavigate()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Permiso de galería denegado",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -44,10 +73,24 @@ class PermissionsFragment : Fragment(R.layout.fragment_permissions) {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    private fun checkGalleryPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            galleryPermission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
     private fun savePermissionGranted() {
         requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
             .edit()
             .putBoolean("CAMERA_PERMISSION_GRANTED", true)
+            .apply()
+    }
+
+    private fun saveGalleryPermissionGranted() {
+        requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean("GALLERY_PERMISSION_GRANTED", true)
             .apply()
     }
 
@@ -57,26 +100,31 @@ class PermissionsFragment : Fragment(R.layout.fragment_permissions) {
         }
     }
 
+    private fun checkAndNavigate() {
+        if (cameraPermissionGranted && galleryPermissionGranted) {
+            navigateToFinal()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Inicializar botones
         val btnCamera: Button = view.findViewById(R.id.btnCameraPermission)
+        val btnGallery: Button = view.findViewById(R.id.btnGalleryPermission)
         val btnContinue: Button = view.findViewById(R.id.btnContinue)
 
-        // Verificar si ya tenemos el permiso
         cameraPermissionGranted = checkCameraPermission()
+        galleryPermissionGranted = checkGalleryPermission()
 
-        // Si ya tiene permisos, navegar automáticamente
-        if (cameraPermissionGranted) {
+        if (cameraPermissionGranted && galleryPermissionGranted) {
             savePermissionGranted()
+            saveGalleryPermissionGranted()
             view.post {
                 navigateToFinal()
             }
             return
         }
 
-        // Configurar el botón de solicitud de permiso de cámara
         btnCamera.setOnClickListener {
             if (!cameraPermissionGranted) {
                 requestCameraPermission.launch(android.Manifest.permission.CAMERA)
@@ -89,14 +137,25 @@ class PermissionsFragment : Fragment(R.layout.fragment_permissions) {
             }
         }
 
-        // Configurar el botón de continuar
+        btnGallery.setOnClickListener {
+            if (!galleryPermissionGranted) {
+                requestGalleryPermission.launch(galleryPermission)
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Ya tienes permiso para usar la galería",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
         btnContinue.setOnClickListener {
-            if (cameraPermissionGranted) {
+            if (cameraPermissionGranted && galleryPermissionGranted) {
                 navigateToFinal()
             } else {
                 Toast.makeText(
                     requireContext(),
-                    "Debes conceder el permiso de cámara para continuar",
+                    "Debes conceder ambos permisos para continuar",
                     Toast.LENGTH_SHORT
                 ).show()
             }
