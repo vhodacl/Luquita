@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:padding="22dp">
+                android:padding="16dp">
 
                 <TextView
                     android:id="@+id/textCardContent"
@@ -75,12 +75,14 @@
 
         <!-- Botones para galería y cámara -->
         <LinearLayout
+            android:id="@+id/buttonsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
             android:padding="16dp"
             android:layout_alignParentBottom="true"
+            android:layout_marginBottom="70dp"
             android:spacing="16dp">
 
             <!-- Botón Galería -->
@@ -160,20 +162,21 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-        <!-- Botón Listo -->
+
+        <!-- Botón Pegar y Normalizar -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/doneButton"
-            android:layout_width="0dp"
+            android:id="@+id/pasteButton"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_below="@id/buttonsContainer"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="-75dp"
             android:background="@drawable/rounded_button"
-            android:padding="8dp"
+            android:padding="12dp"
             android:text="Pegar y Normalizar"
             android:textStyle="bold"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:textSize="16sp"/>
+
     </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
