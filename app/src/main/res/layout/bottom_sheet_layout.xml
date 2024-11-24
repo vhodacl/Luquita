@@ -3,85 +3,112 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
 
-    <!-- ¿Cómo funciona? -->
-    <LinearLayout
-        android:id="@+id/how_it_works"
+    <!-- Título -->
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:text="Menú"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingTop="20dp"
+        android:paddingBottom="16dp"
+        android:layout_marginHorizontal="16dp"/>
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/help"
-            app:tint="?attr/colorOnSurface" />
+    <!-- Línea divisoria -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        android:layout_marginBottom="8dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="¿Cómo funciona?"
-            android:textSize="16sp" />
-    </LinearLayout>
-
-    <!-- Política de privacidad -->
+    <!-- Contenido existente -->
     <LinearLayout
-        android:id="@+id/privacy_policy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="16dp">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/policy"
-            app:tint="?attr/colorOnSurface" />
-
-        <TextView
+        <!-- ¿Cómo funciona? -->
+        <LinearLayout
+            android:id="@+id/how_it_works"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Política de privacidad de Luquita"
-            android:textSize="16sp" />
-    </LinearLayout>
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-    <!-- Página del Desarrollador -->
-    <LinearLayout
-        android:id="@+id/developer_page"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/help"
+                app:tint="?attr/colorOnSurface" />
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/coder"
-            app:tint="?attr/colorOnSurface" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="¿Cómo funciona?"
+                android:textSize="16sp" />
+        </LinearLayout>
 
-        <TextView
+        <!-- Política de privacidad -->
+        <LinearLayout
+            android:id="@+id/privacy_policy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Página del Desarrollador"
-            android:textSize="16sp" />
-    </LinearLayout>
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/policy"
+                app:tint="?attr/colorOnSurface" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Política de privacidad de Luquita"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- Página del Desarrollador -->
+        <LinearLayout
+            android:id="@+id/developer_page"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/coder"
+                app:tint="?attr/colorOnSurface" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Página del Desarrollador"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+    </LinearLayout>
 </LinearLayout> 

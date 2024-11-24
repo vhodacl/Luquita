@@ -23,15 +23,17 @@
             android:scaleType="fitCenter"
             android:layout_gravity="center"/>
 
-        <ImageView
+        <ImageButton
             android:id="@+id/more_options"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="end"
-            android:layout_marginEnd="16dp"
-            app:tint="@color/md_theme_onBackground"
+            android:layout_marginEnd="10dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Más opciones"
+            android:padding="6dp"
             android:src="@drawable/more"
-            android:contentDescription="Más opciones"/>
+            app:tint="@color/md_theme_onBackground"/>
 
     </com.google.android.material.appbar.MaterialToolbar>
 

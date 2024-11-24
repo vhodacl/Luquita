@@ -226,12 +226,24 @@ class MainActivity : AppCompatActivity() {
         }
 
         bottomSheetView.findViewById<LinearLayout>(R.id.privacy_policy).setOnClickListener {
-            // TODO: Implementar acción para "Política de privacidad"
+            // Abrir política de privacidad
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://softcool.cl/luquita/policy"))
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "No se pudo abrir el enlace", Toast.LENGTH_SHORT).show()
+            }
             bottomSheetDialog.dismiss()
         }
 
         bottomSheetView.findViewById<LinearLayout>(R.id.developer_page).setOnClickListener {
-            // TODO: Implementar acción para "Página del Desarrollador"
+            // Abrir página del desarrollador
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://softcool.cl"))
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "No se pudo abrir el enlace", Toast.LENGTH_SHORT).show()
+            }
             bottomSheetDialog.dismiss()
         }
 
