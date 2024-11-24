@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="camera_transition_duration">100</integer>
+    
+    <transition name="camera_transition">
+        <item name="android:duration">@integer/camera_transition_duration</item>
+        <item name="android:interpolator">@android:interpolator/fast_out_linear_in</item>
+    </transition>
+</resources> 

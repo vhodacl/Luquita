@@ -50,9 +50,21 @@ class CheckInImageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_in_image)
 
+        setupTransparentBars()
         initializeViews()
-        handleIncomingImage() // Procesa automáticamente al cargar la imagen.
-        btnFinalizar.setOnClickListener { finishAndSendResults() } // Botón para finalizar la actividad y enviar los datos
+        handleIncomingImage()
+        btnFinalizar.setOnClickListener { finishAndSendResults() }
+    }
+
+    private fun setupTransparentBars() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.statusBarColor = resources.getColor(android.R.color.transparent, theme)
+            window.navigationBarColor = resources.getColor(android.R.color.transparent, theme)
+
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        }
     }
 
     private fun initializeViews() {
