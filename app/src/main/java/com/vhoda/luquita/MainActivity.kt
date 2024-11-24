@@ -9,10 +9,13 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.vhoda.luquita.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -79,6 +82,10 @@ class MainActivity : AppCompatActivity() {
         binding.camera.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
+        }
+
+        binding.moreOptions.setOnClickListener {
+            showBottomSheet()
         }
     }
 
@@ -205,5 +212,29 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "Error starting CheckInImageActivity: ${e.message}")
             Toast.makeText(this, "Error al abrir el procesador de imágenes", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun showBottomSheet() {
+        val bottomSheetView = layoutInflater.inflate(R.layout.bottom_sheet_layout, null)
+        val bottomSheetDialog = BottomSheetDialog(this)
+        bottomSheetDialog.setContentView(bottomSheetView)
+
+        // Configurar click listeners para las opciones
+        bottomSheetView.findViewById<LinearLayout>(R.id.how_it_works).setOnClickListener {
+            // TODO: Implementar acción para "¿Cómo funciona?"
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetView.findViewById<LinearLayout>(R.id.privacy_policy).setOnClickListener {
+            // TODO: Implementar acción para "Política de privacidad"
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetView.findViewById<LinearLayout>(R.id.developer_page).setOnClickListener {
+            // TODO: Implementar acción para "Página del Desarrollador"
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.show()
     }
 }
