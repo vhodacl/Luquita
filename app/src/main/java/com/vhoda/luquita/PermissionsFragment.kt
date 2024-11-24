@@ -24,18 +24,28 @@ class PermissionsFragment : Fragment(R.layout.fragment_permissions) {
 
     private fun getViewPager() = (activity as? WelcomeActivity)?.findViewById<ViewPager2>(R.id.viewPager)
 
+    private fun updatePermissionViews() {
+        view?.let { view ->
+            val btnCamera = view.findViewById<Button>(R.id.btnCameraPermission)
+            val btnGallery = view.findViewById<Button>(R.id.btnGalleryPermission)
+            val cameraGrantedLayout = view.findViewById<View>(R.id.cameraPermissionGrantedLayout)
+            val galleryGrantedLayout = view.findViewById<View>(R.id.galleryPermissionGrantedLayout)
+
+            btnCamera.visibility = if (cameraPermissionGranted) View.GONE else View.VISIBLE
+            cameraGrantedLayout.visibility = if (cameraPermissionGranted) View.VISIBLE else View.GONE
+
+            btnGallery.visibility = if (galleryPermissionGranted) View.GONE else View.VISIBLE
+            galleryGrantedLayout.visibility = if (galleryPermissionGranted) View.VISIBLE else View.GONE
+        }
+    }
+
     private val requestCameraPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         cameraPermissionGranted = isGranted
         if (isGranted) {
             savePermissionGranted()
-            Toast.makeText(
-                requireContext(),
-                "Permiso de cámara concedido",
-                Toast.LENGTH_SHORT
-            ).show()
-            checkAndNavigate()
+            updatePermissionViews()
         } else {
             Toast.makeText(
                 requireContext(),
@@ -51,12 +61,7 @@ class PermissionsFragment : Fragment(R.layout.fragment_permissions) {
         galleryPermissionGranted = isGranted
         if (isGranted) {
             saveGalleryPermissionGranted()
-            Toast.makeText(
-                requireContext(),
-                "Permiso de galería concedido",
-                Toast.LENGTH_SHORT
-            ).show()
-            checkAndNavigate()
+            updatePermissionViews()
         } else {
             Toast.makeText(
                 requireContext(),
@@ -100,12 +105,6 @@ class PermissionsFragment : Fragment(R.layout.fragment_permissions) {
         }
     }
 
-    private fun checkAndNavigate() {
-        if (cameraPermissionGranted && galleryPermissionGranted) {
-            navigateToFinal()
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -116,13 +115,11 @@ class PermissionsFragment : Fragment(R.layout.fragment_permissions) {
         cameraPermissionGranted = checkCameraPermission()
         galleryPermissionGranted = checkGalleryPermission()
 
+        updatePermissionViews()
+
         if (cameraPermissionGranted && galleryPermissionGranted) {
             savePermissionGranted()
             saveGalleryPermissionGranted()
-            view.post {
-                navigateToFinal()
-            }
-            return
         }
 
         btnCamera.setOnClickListener {

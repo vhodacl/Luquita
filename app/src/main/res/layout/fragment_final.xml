@@ -2,23 +2,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:background="@color/md_theme_background"
     android:padding="16dp">
 
+
+    <ImageView
+        android:layout_width="98dp"
+        android:layout_height="98dp"
+        android:layout_marginTop="120dp"
+        android:src="@drawable/handshake"
+        android:tint="@color/md_theme_primary"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp" />
+
     <TextView
-        android:id="@+id/txtMessage"
+        android:id="@+id/txtTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="¡Ya estás listo! Puedes iniciar Luquita."
+        android:text="¡Ya estás listo!"
+        android:textSize="38sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/txtSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ya puedes iniciar Luquita"
         android:textSize="18sp"
-        android:textAlignment="center"
-        android:paddingBottom="24dp" />
+        android:layout_gravity="center"
+        android:textAlignment="center" />
+
+    <!-- Espacio flexible en medio -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <Button
         android:id="@+id/btnStartApp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Iniciar Luquita" />
+        android:text="Comenzar Luquita"
+        android:textStyle="bold" />
 
 </LinearLayout>

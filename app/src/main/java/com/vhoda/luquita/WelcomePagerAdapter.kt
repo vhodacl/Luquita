@@ -6,9 +6,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class WelcomePagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activity) {
 
-    // Cambiar el número de pantallas a 5 en lugar de 4, ya que tienes 5 fragmentos
+    // Cambiar el número de pantallas a 4 en lugar de 5, ya que tienes 4 fragmentos
     override fun getItemCount(): Int {
-        return 5 // Cuatro pantallas
+        return 4 // Reducido a 4 pantallas
     }
 
     // Crear los fragmentos según la posición
@@ -16,9 +16,8 @@ class WelcomePagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(ac
         return when (position) {
             0 -> WelcomeFragment()      // Primer fragmento
             1 -> ExplanationFragment()  // Segundo fragmento
-            2 -> NoticeFragment()       // Tercer fragmento
-            3 -> PermissionsFragment()  // Cuarto fragmento (permisos)
-            4 -> FinalFragment()        // Quinto fragmento (final)
+            2 -> PermissionsFragment()  // Tercer fragmento
+            3 -> FinalFragment()        // Cuarto fragmento
             else -> WelcomeFragment()   // Default en caso de error
         }
     }

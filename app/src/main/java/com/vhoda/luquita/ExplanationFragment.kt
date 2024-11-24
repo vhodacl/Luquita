@@ -11,9 +11,9 @@ class ExplanationFragment : Fragment(R.layout.fragment_explanation) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val btnNext: MaterialButton = view.findViewById(R.id.btnNext)
+        val btnNext: MaterialButton = view.findViewById(R.id.btnContinue)
         btnNext.setOnClickListener {
-            // Navegar al siguiente fragmento
+            // Navegar al siguiente fragmento (PermissionsFragment)
             (activity as WelcomeActivity).findViewById<ViewPager2>(R.id.viewPager).currentItem = 2
         }
     }
