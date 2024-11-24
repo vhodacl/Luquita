@@ -158,4 +158,12 @@ class PermissionsFragment : Fragment(R.layout.fragment_permissions) {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        // Actualizar estado de permisos
+        cameraPermissionGranted = checkCameraPermission()
+        galleryPermissionGranted = checkGalleryPermission()
+        updatePermissionViews()
+    }
 }

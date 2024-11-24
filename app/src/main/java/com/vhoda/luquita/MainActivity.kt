@@ -219,6 +219,14 @@ class MainActivity : AppCompatActivity() {
         val bottomSheetDialog = BottomSheetDialog(this)
         bottomSheetDialog.setContentView(bottomSheetView)
 
+        // Configurar la barra de navegación
+        bottomSheetDialog.window?.apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                navigationBarColor = resources.getColor(android.R.color.transparent, theme)
+                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            }
+        }
+
         // Configurar click listeners para las opciones
         bottomSheetView.findViewById<LinearLayout>(R.id.how_it_works).setOnClickListener {
             // TODO: Implementar acción para "¿Cómo funciona?"
