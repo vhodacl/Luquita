@@ -49,4 +49,5 @@
         <item name="android:fontFamily">@font/inter</item>
         <item name="fontFamily">@font/inter</item>
     </style>
+    
 </resources>
