@@ -31,18 +31,26 @@ class ResultActivity : AppCompatActivity() {
     // Lista completa de bancos disponibles
     private val banksList = listOf(
         "Seleccione un banco",
-        "Banco Estado",
-        "Banco Santander",
-        "Banco de Chile",
-        "Banco Falabella",
         "Banco BCI",
+        "Banco BCI/MACH",
+        "Banco BICE",
+        "Banco Corpbanca",
+        "Banco de Chile",
+        "Banco Estado",
+        "Banco Falabella",
+        "Banco Internacional",
+        "Banco Ripley",
+        "Banco Santander",
+        "Banco Security",
+        "Consorcio",
+        "Coopeuch",
+        "Copec APP",
+        "Itaú",
+        "Lapolar Prepago",
         "Mercado Pago",
         "Scotiabank",
-        "Itaú",
-        "Tenpo",
         "TAPP",
-        "Copec APP",
-        "Banco BCI/MACH"
+        "Tenpo"
     )
 
     // Lista de tipos de cuenta
@@ -60,15 +68,23 @@ class ResultActivity : AppCompatActivity() {
         "Banco Santander" to R.drawable.santander,
         "Banco de Chile" to R.drawable.bancochile,
         "Banco Falabella" to R.drawable.bancofalabella,
+        "Banco Ripley" to R.drawable.bancoripley,
         "Banco BCI" to R.drawable.bci,
-        "BCI" to R.drawable.bci,
+        "Banco BICE" to R.drawable.bancobice,
+        "Banco Corpbanca" to R.drawable.bancocorpbanca,
+        "Banco Internacional" to R.drawable.bancointernacional,
+        "Banco Security" to R.drawable.bancosecurity,
+        "Consorcio" to R.drawable.consorcio,
+        "Coopeuch" to R.drawable.coopeuch,
         "Mercado Pago" to R.drawable.mercadopago,
+        "Lapolar Prepago" to R.drawable.lapolar,
         "Scotiabank" to R.drawable.scotiabank,
         "Itaú" to R.drawable.itau,
         "Tenpo" to R.drawable.tenpo,
         "TAPP" to R.drawable.tapp,
         "Copec APP" to R.drawable.copec,
-        "Banco BCI/MACH" to R.drawable.mach
+        "Banco BCI/MACH" to R.drawable.mach,
+        "BCI" to R.drawable.bci
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

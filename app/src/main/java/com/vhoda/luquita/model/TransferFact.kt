@@ -71,6 +71,78 @@ object TransferFactsProvider {
         TransferFact(
             "¿Cuál es el colmo de un banco? Que se quede sin cuenta",
         ),
+        TransferFact(
+            "¿Sabías que en la antigua China usaban cuchillos como moneda? ¡Imagina pagar tu café con uno!",
+            "Antigua China"
+        ),
+        TransferFact(
+            "En 2010, alguien compró dos pizzas por 10,000 Bitcoins. ¡Hoy eso valdría más de 300 millones de dólares!",
+            "Bitcoin Pizza Day"
+        ),
+        TransferFact(
+            "¿Por qué el euro fue al gimnasio? ¡Para fortalecer su valor!",
+        ),
+        TransferFact(
+            "¿Sabías que M-PESA en Kenia mueve más del 50% del PIB del país a través de pagos móviles?",
+            "Banco Central de Kenia"
+        ),
+        TransferFact(
+            "¿Qué le dice un cajero automático a otro? ¡Qué retirado te veo!",
+        ),
+        TransferFact(
+            "En Dinamarca es ilegal pagar en efectivo compras mayores a 50,000 coronas. ¡Todo debe ser digital!",
+            "Gobierno de Dinamarca"
+        ),
+        TransferFact(
+            "¿Por qué el dólar no puede dormir? ¡Porque tiene muchas cuentas pendientes!",
+        ),
+        TransferFact(
+            "Los vikingos usaban pulseras de plata como moneda. ¡Literalmente llevaban su dinero puesto!",
+            "Historia Vikinga"
+        ),
+        TransferFact(
+            "¿Cuál es el animal más rico? ¡El cerdo, porque siempre tiene plata en el banco!",
+        ),
+        TransferFact(
+            "El primer pago con tarjeta de crédito fue en 1950 en un restaurante de Nueva York. ¡El dueño de la tarjeta se había olvidado su billetera!",
+            "Diners Club"
+        ),
+        TransferFact(
+            "¿Sabías que la CuentaRUT fue creada en 2006 y hoy más del 80% de los chilenos tiene una?",
+            "BancoEstado"
+        ),
+        TransferFact(
+            "¿Por qué las lucas fueron al Cajero? ¡Porque querían salir a carretear!",
+        ),
+        TransferFact(
+            "Chile fue pionero en Latinoamérica con las transferencias electrónicas. ¡La primera TEF interbancaria se realizó en 2001!",
+            "Banco Central de Chile"
+        ),
+        TransferFact(
+            "¿Qué le dice una luca a otra luca? ¡Nos vemos en el Super8!",
+        ),
+        TransferFact(
+            "En Chile, las transferencias electrónicas crecieron un 330% durante la pandemia. ¡De la presencial a la digital al toque!",
+            "CMF Chile"
+        ),
+        TransferFact(
+            "¿Por qué la CuentaRUT fue al psicólogo? ¡Porque tenía problemas de autoestima con sus comisiones!",
+        ),
+        TransferFact(
+            "¿Sabías que en Chile se realizan más de 100 millones de transferencias electrónicas al mes? ¡Somos más digitales que el mote con huesillo!",
+            "Banco Central de Chile"
+        ),
+        TransferFact(
+            "¿Qué le dice un peso chileno a un dólar? 'Algún día te alcanzaré... pero no hoy día'",
+        ),
+        TransferFact(
+            "La primera tarjeta de débito en Chile fue emitida en 1987. ¡Y ahora hasta pagamos con el celular!",
+            "Transbank"
+        ),
+        TransferFact(
+            "¿Sabías que los chilenos prefieren transferir que pagar en efectivo? ¡El 76% de las transacciones son digitales!",
+            "CMF Chile"
+        )
     )
 
     fun getRandomFact(): TransferFact {
