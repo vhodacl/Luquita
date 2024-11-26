@@ -266,7 +266,7 @@ class CameraActivity : AppCompatActivity() {
             "cta rut" to "Banco Estado",
             "ctarut" to "Banco Estado",
             "cta.rut" to "Banco Estado",
-            "bci" to "Banco Crédito e Inversiones",
+            "bci" to "Banco BCI",
             "banco chile" to "Banco de Chile",
             "banco de chile" to "Banco de Chile",
             "Santander" to "Banco Santander",
@@ -278,8 +278,8 @@ class CameraActivity : AppCompatActivity() {
             "itau" to "Itaú",
             "tenpo" to "Tenpo",
             "tapp" to "TAPP",
-            "copec" to "Copec",
-            "mach" to "MACH"
+            "copec" to "Copec APP",
+            "mach" to "Banco BCI/MACH"
         )
 
         for (line in lines) {
