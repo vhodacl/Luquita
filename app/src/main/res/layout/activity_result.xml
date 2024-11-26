@@ -51,191 +51,169 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="3dp">
+            android:padding="10dp">
 
-            <!-- Logo y Nombre -->
+            <!-- Logo del Banco -->
+            <ImageView
+                android:id="@+id/logoImageView"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:padding="2dp"
+                android:layout_marginStart="0dp"
+                android:paddingStart="0dp"
+                android:layout_marginBottom="10dp"
+                android:contentDescription="Logo del banco"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_image_background" />
+            <View style="@style/Divider" />
+            <!-- Campo Nombre/Empresa -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
+                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <ImageView
-                    android:id="@+id/logoImageView"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginEnd="12dp" />
-
-            </LinearLayout>
-            <!-- Separador -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0" />
-            <!-- Nombre de la Compañía o Usuario -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="4dp">
+                android:paddingVertical="3dp">
 
                 <EditText
                     android:id="@+id/companyNameEditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="16sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
-                    android:hint="Nombre o Empresa" />
+                    android:hint="Nombre o Empresa"
+                    android:singleLine="true"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:background="@null"
+                    android:paddingVertical="3dp" />
 
-                <!-- Icono de validación -->
                 <ImageView
+                    android:id="@+id/companyNameValidation"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
                     android:src="@drawable/task_alt"
-                    android:tint="#4CAF50" />
+                    app:tint="@color/validation_icon_color" />
             </LinearLayout>
 
-            <!-- Separador -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0" />
+            <View style="@style/Divider" />
 
-            <!-- RUT -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="4dp">
-
+            <!-- Campo RUT -->
+            <LinearLayout style="@style/InputContainer">
                 <EditText
                     android:id="@+id/rutEditText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="14sp"
-                    android:hint="RUT" />
+                    style="@style/InputField"
+                    android:hint="RUT"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="3dp"
+                    android:inputType="text" />
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/task_alt"
-                    android:tint="#4CAF50" />
+                    android:id="@+id/rutValidation"
+                    style="@style/ValidationIcon" />
             </LinearLayout>
 
-            <!-- Separador -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0" />
+            <View style="@style/Divider" />
 
-            <!-- Correo -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="4dp">
-
+            <!-- Campo Email -->
+            <LinearLayout style="@style/InputContainer">
                 <EditText
                     android:id="@+id/emailEditText"
+                    style="@style/InputField"
+                    android:hint="Correo"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="3dp"
+                    android:inputType="textEmailAddress" />
+
+                <ImageView
+                    android:id="@+id/emailValidation"
+                    style="@style/ValidationIcon" />
+            </LinearLayout>
+
+            <View style="@style/Divider" />
+
+            <!-- Campo Banco -->
+            <LinearLayout style="@style/InputContainer">
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="14sp"
-                    android:hint="Correo" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    
+                    <Spinner
+                        android:id="@+id/bankSpinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/SpinnerField"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="3dp"/>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/expand_more"
+                        app:tint="@color/md_theme_onBackground"
+                        android:layout_marginStart="4dp"/>
+                </LinearLayout>
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/task_alt"
-                    android:tint="#4CAF50" />
+                    android:id="@+id/bankValidation"
+                    style="@style/ValidationIcon" />
             </LinearLayout>
 
-            <!-- Separador -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0" />
+            <View style="@style/Divider" />
 
-            <!-- Banco -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="7dp">
-
-                <Spinner
-                    android:id="@+id/bankSpinner"
+            <!-- Campo Tipo de Cuenta -->
+            <LinearLayout style="@style/InputContainer">
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="16sp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    
+                    <Spinner
+                        android:id="@+id/accountTypeSpinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/SpinnerField"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="3dp"/>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/expand_more"
+                        app:tint="@color/md_theme_onBackground"
+                        android:layout_marginStart="4dp"/>
+                </LinearLayout>
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/task_alt"
-                    android:tint="#4CAF50" />
+                    android:id="@+id/accountTypeValidation"
+                    style="@style/ValidationIcon" />
             </LinearLayout>
 
-            <!-- Separador -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0" />
+            <View style="@style/Divider" />
 
-            <!-- Tipo de Cuenta -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="7dp">
-
-                <Spinner
-                    android:id="@+id/accountTypeSpinner"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="14sp" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/task_alt"
-                    android:tint="#4CAF50" />
-            </LinearLayout>
-
-            <!-- Separador -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0" />
-
-            <!-- Número de Cuenta -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="4dp">
-
+            <!-- Campo Número de Cuenta -->
+            <LinearLayout style="@style/InputContainer">
                 <EditText
                     android:id="@+id/accountNumberEditText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="16sp"
-                    android:hint="Número de Cuenta" />
+                    style="@style/InputField"
+                    android:hint="Número de Cuenta"
+                    android:inputType="number"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="2dp"/>
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/task_alt"
-                    android:tint="#4CAF50" />
+                    android:id="@+id/accountNumberValidation"
+                    style="@style/ValidationIcon" />
             </LinearLayout>
-
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

@@ -49,5 +49,50 @@
         <item name="android:fontFamily">@font/inter</item>
         <item name="fontFamily">@font/inter</item>
     </style>
+
+        <!-- Estilo base para contenedores de input -->
+    <style name="InputContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingVertical">8dp</item>
+    </style>
+
+    <!-- Estilo base para campos de entrada -->
+    <style name="InputField">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:imeOptions">actionNext</item>
+        <item name="android:background">@null</item>
+        <item name="android:paddingVertical">8dp</item>
+    </style>
+
+    <!-- Estilo para Spinners -->
+    <style name="SpinnerField">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingVertical">8dp</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <!-- Estilo para íconos de validación -->
+    <style name="ValidationIcon">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:src">@drawable/task_alt</item>
+    </style>
+
+    <!-- Estilo para divisores -->
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/md_theme_outline</item>
+    </style>
     
 </resources>
