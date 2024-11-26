@@ -29,6 +29,37 @@ import android.graphics.YuvImage
 import android.graphics.ImageFormat
 import kotlin.math.roundToInt
 
+data class BankData(
+    var companyName: String? = null,
+    var rut: String? = null,
+    var bank: String? = null,
+    var accountType: String? = null,
+    var accountNumber: String? = null,
+    var email: String? = null
+) {
+    fun isValid(): Boolean {
+        var validFields = 0
+        if (!companyName.isNullOrBlank()) validFields++
+        if (!rut.isNullOrBlank() && rut!!.matches(Regex("\\d{1,2}\\.\\d{3}\\.\\d{3}-[\\dkK]"))) validFields++
+        if (!bank.isNullOrBlank()) validFields++
+        if (!accountType.isNullOrBlank()) validFields++
+        if (!accountNumber.isNullOrBlank()) validFields++
+        if (!email.isNullOrBlank() && email!!.contains("@")) validFields++
+        return validFields >= 3
+    }
+
+    fun toMap(): Map<String, String> {
+        return mapOf(
+            "Nombre" to (companyName ?: ""),
+            "RUT" to (rut ?: ""),
+            "Banco" to (bank ?: ""),
+            "Tipo de Cuenta" to (accountType ?: ""),
+            "Número de Cuenta" to (accountNumber ?: ""),
+            "Correo" to (email ?: "")
+        )
+    }
+}
+
 class CameraActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCameraBinding
     private var camera: Camera? = null
@@ -44,37 +75,6 @@ class CameraActivity : AppCompatActivity() {
     private val CAMERA_PERMISSION_REQUEST_CODE = 1001
     private val PROCESS_INTERVAL = 1000L
     private var isTextDetected = false
-
-    data class BankData(
-        var companyName: String? = null,
-        var rut: String? = null,
-        var bank: String? = null,
-        var accountType: String? = null,
-        var accountNumber: String? = null,
-        var email: String? = null
-    ) {
-        fun isValid(): Boolean {
-            var validFields = 0
-            if (!companyName.isNullOrBlank()) validFields++
-            if (!rut.isNullOrBlank() && rut!!.matches(Regex("\\d{1,2}\\d{3}\\d{3}-[\\dkK]"))) validFields++
-            if (!bank.isNullOrBlank()) validFields++
-            if (!accountType.isNullOrBlank()) validFields++
-            if (!accountNumber.isNullOrBlank()) validFields++
-            if (!email.isNullOrBlank() && email!!.contains("@")) validFields++
-            return validFields >= 3
-        }
-
-        fun toMap(): Map<String, String> {
-            return mapOf(
-                "Nombre" to (companyName ?: ""),
-                "RUT" to (rut ?: ""),
-                "Banco" to (bank ?: ""),
-                "Tipo de Cuenta" to (accountType ?: ""),
-                "Número de Cuenta" to (accountNumber ?: ""),
-                "Correo" to (email ?: "")
-            )
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -265,72 +265,89 @@ class CameraActivity : AppCompatActivity() {
         val bankData = BankData()
         val lines = text.split("\n")
 
-        // Lista de palabras clave de bancos conocidos
-        val knownBanks = mapOf(
-            "estado" to "Banco Estado",
-            "cuenta rut" to "Banco Estado",
-            "cta rut" to "Banco Estado",
-            "ctarut" to "Banco Estado",
-            "cta.rut" to "Banco Estado",
-            "bci" to "Banco BCI",
-            "banco chile" to "Banco de Chile",
-            "banco de chile" to "Banco de Chile",
-            "Santander" to "Banco Santander",
-            "santander" to "Banco Santander",
-            "mercado pago" to "Mercado Pago",
-            "ripley" to "Banco Ripley",
-            "falabella" to "Banco Falabella",
-            "scotiabank" to "Scotiabank",
-            "itau" to "Itaú",
-            "tenpo" to "Tenpo",
-            "tapp" to "TAPP",
-            "copec" to "Copec APP",
-            "mach" to "Banco BCI/MACH"
+        // Buscar primero si hay alguna referencia a Cuenta RUT
+        val hasCuentaRut = lines.any { line ->
+            val normalizedLine = line.trim().lowercase()
+            normalizedLine.contains("cuenta rut") ||
+            normalizedLine.contains("cta rut") ||
+            normalizedLine.contains("cta.rut") ||
+            normalizedLine.contains("ctarut") ||
+            normalizedLine.contains("c. rut")
+        }
+
+        // Si encontramos Cuenta RUT, establecer el tipo de cuenta y banco
+        if (hasCuentaRut) {
+            bankData.accountType = "Cuenta RUT"
+            bankData.bank = "Banco Estado"
+        }
+
+        // Mapa de palabras clave para detectar bancos
+        val bankKeywords = mapOf(
+            "Banco BCI" to listOf("bci"),
+            "Banco BCI/MACH" to listOf("mach"),
+            "Banco BICE" to listOf("bice"),
+            "Banco Corpbanca" to listOf("corpbanca", "itau"),
+            "Banco de Chile" to listOf("chile"),
+            "Banco Estado" to listOf("estado", "banestado"),
+            "Banco Falabella" to listOf("falabella"),
+            "Banco Internacional" to listOf("internacional"),
+            "Banco Ripley" to listOf("ripley"),
+            "Banco Santander" to listOf("santander"),
+            "Banco Security" to listOf("security"),
+            "Consorcio" to listOf("consorcio"),
+            "Coopeuch" to listOf("coopeuch"),
+            "Copec APP" to listOf("copec"),
+            "Itaú" to listOf("itau"),
+            "Lapolar Prepago" to listOf("polar", "lapolar"),
+            "Mercado Pago" to listOf("mercado", "mercadopago", "mp"),
+            "Scotiabank" to listOf("scotia", "scotiabank"),
+            "TAPP" to listOf("tapp"),
+            "Tenpo" to listOf("tenpo")
         )
 
         for (line in lines) {
             val normalizedLine = line.trim().lowercase()
 
+            // Detectar banco usando palabras clave
+            if (bankData.bank == null || bankData.bank == "No disponible") {
+                for ((bankName, keywords) in bankKeywords) {
+                    if (keywords.any { keyword -> normalizedLine.contains(keyword.lowercase()) }) {
+                        bankData.bank = bankName
+                        break
+                    }
+                }
+            }
+
             when {
-                // Detectar bancos basados en palabras clave conocidas
-                knownBanks.keys.any { normalizedLine.contains(it) } -> {
-                    val matchedBank = knownBanks.entries.find { normalizedLine.contains(it.key) }
-                    if (matchedBank != null) {
-                        bankData.bank = matchedBank.value
+                // Detectar RUT
+                line.matches(Regex(".*\\b\\d{1,2}[.]?\\d{3}[.]?\\d{3}-?[\\dkK]\\b.*")) -> {
+                    val rutMatch = line.replace(Regex("[^\\dkK.-]"), "").trim()
+                    bankData.rut = formatRut(rutMatch)
+                    
+                    // Si es una Cuenta RUT, usar el RUT como número de cuenta
+                    if (bankData.accountType == "Cuenta RUT") {
+                        bankData.accountNumber = rutMatch.replace(Regex("[^0-9]"), "").dropLast(1)
                     }
                 }
 
-                // Lógica específica para Banco Estado y variaciones de "cta rut"
-                normalizedLine.contains("banco estado") ||
-                        normalizedLine.contains("cuenta rut") ||
-                        normalizedLine.contains("cta rut") ||
-                        normalizedLine.contains("ctarut") ||
-                        normalizedLine.contains("cta.rut") ||
-                        normalizedLine.contains("c. rut") -> {
-                    bankData.bank = "Banco Estado"
-
-                    // Verificar que "Cta rut" o sus variaciones se asignen como "Cuenta RUT"
-                    if (normalizedLine.contains("cta rut") ||
-                        normalizedLine.contains("ctarut") ||
-                        normalizedLine.contains("cta.rut") ||
-                        normalizedLine.contains("c. rut")) {
-                        bankData.accountType = "Cuenta RUT"
-                    }
-                    // Si "cuenta vista" aparece en la línea, asignar "Cuenta Vista"
-                    else if (normalizedLine.contains("cuenta vista") && bankData.accountType != "Cuenta RUT") {
-                        bankData.accountType = "Cuenta Vista"
-                    }
-                }
-
-                // Detectar tipos de cuenta basados en palabras clave
+                // Detectar tipos de cuenta
                 normalizedLine.contains("cuenta") || normalizedLine.contains("cta") -> {
                     when {
-                        normalizedLine.contains("rut") && bankData.accountType != "Cuenta RUT" -> bankData.accountType = "Cuenta RUT"
-                        normalizedLine.contains("vista") && bankData.accountType != "Cuenta RUT" -> bankData.accountType = "Cuenta Vista"
-                        normalizedLine.contains("corriente") -> bankData.accountType = "Cuenta Corriente"
-                        normalizedLine.contains("electronica") -> bankData.accountType = "Chequera Electrónica"
-                        normalizedLine.contains("chequera") -> bankData.accountType = "Chequera Electrónica"
-                        normalizedLine.contains("ahorro") -> bankData.accountType = "Cuenta de Ahorro"
+                        // Priorizar Cuenta RUT sobre otros tipos
+                        normalizedLine.contains("rut") -> {
+                            bankData.accountType = "Cuenta RUT"
+                            bankData.bank = "Banco Estado"
+                        }
+                        // Solo asignar otros tipos si no es Cuenta RUT
+                        !hasCuentaRut -> {
+                            when {
+                                normalizedLine.contains("vista") -> bankData.accountType = "Cuenta Vista"
+                                normalizedLine.contains("corriente") -> bankData.accountType = "Cuenta Corriente"
+                                normalizedLine.contains("electronica") || normalizedLine.contains("chequera") -> 
+                                    bankData.accountType = "Chequera Electrónica"
+                                normalizedLine.contains("ahorro") -> bankData.accountType = "Cuenta de Ahorro"
+                            }
+                        }
                     }
                 }
 
@@ -341,11 +358,12 @@ class CameraActivity : AppCompatActivity() {
                     bankData.accountNumber = line.replace(Regex("[^0-9]"), "")
                 }
 
-                // Detectar RUT (formato xx.xxx.xxx-x o xxxxxxxx-x) y preservarlo
-                line.matches(Regex(".*\\b\\d{1,2}\\.?\\d{3}\\.?\\d{3}-?\\d{1,2}\\b.*")) -> {
-                    // Mantener el RUT con el formato completo, incluyendo el dígito verificador
-                    val rut = line.replace(Regex("[^\\dxX.-]"), "").trim()
-                    bankData.rut = rut
+                // Detectar RUT (formato xx.xxx.xxx-x o xxxxxxxx-x)
+                line.matches(Regex(".*\\b\\d{1,2}\\.?\\d{3}\\.?\\d{3}-?[\\dkK]\\b.*")) -> {
+                    // Mantener el RUT con el formato completo, incluyendo el dígito verificador K
+                    val rutMatch = line.replace(Regex("[^\\dkK.-]"), "").trim()
+                    // Asegurar que la K esté en mayúscula
+                    bankData.rut = rutMatch.uppercase()
                 }
 
                 // Detectar correos electrónicos
@@ -472,4 +490,18 @@ enum class ScanState {
     IDLE,
     SCANNING,
     DETECTED
+}
+
+// Agregar esta función de utilidad
+private fun formatRut(rut: String): String {
+    // Limpia el RUT dejando solo números y K
+    val cleanRut = rut.replace(Regex("[^0-9Kk]"), "").uppercase()
+    return when {
+        cleanRut.length <= 1 -> cleanRut
+        else -> {
+            val body = cleanRut.substring(0, cleanRut.length - 1)
+            val dv = cleanRut.last()
+            "${body.reversed().chunked(3).joinToString(".").reversed()}-$dv"
+        }
+    }
 }

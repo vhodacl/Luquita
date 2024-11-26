@@ -127,11 +127,11 @@ class CheckInImageActivity : AppCompatActivity() {
                     val recognizedText = visionText.text
                     Log.d(TAG, "Texto reconocido: $recognizedText")
 
-                    detectedText = if (recognizedText.isNotEmpty()) {
-                        recognizedText
-                    } else {
-                        "No se detectó texto en la imagen"
-                    }
+                    // Usar el mismo parser que CameraActivity
+                    val bankData = parseBankData(recognizedText)
+                    
+                    // Formatear el texto detectado con los datos parseados
+                    detectedText = buildFormattedText(bankData)
 
                     val tvDetectedText = findViewById<TextView>(R.id.tv_detected_text)
                     tvDetectedText.text = detectedText
@@ -160,6 +160,116 @@ class CheckInImageActivity : AppCompatActivity() {
             isProcessing = false
             showProgress(false)
         }
+    }
+
+    private fun parseBankData(text: String): BankData {
+        val bankData = BankData()
+        val lines = text.split("\n")
+
+        // Mapa de palabras clave para detectar bancos (igual que en CameraActivity)
+        val bankKeywords = mapOf(
+            "Banco BCI" to listOf("bci"),
+            "Banco BCI/MACH" to listOf("mach"),
+            "Banco BICE" to listOf("bice"),
+            "Banco Corpbanca" to listOf("corpbanca", "itau"),
+            "Banco de Chile" to listOf("chile"),
+            "Banco Estado" to listOf("estado", "banestado"),
+            "Banco Falabella" to listOf("falabella"),
+            "Banco Internacional" to listOf("internacional"),
+            "Banco Ripley" to listOf("ripley"),
+            "Banco Santander" to listOf("santander"),
+            "Banco Security" to listOf("security"),
+            "Consorcio" to listOf("consorcio"),
+            "Coopeuch" to listOf("coopeuch"),
+            "Copec APP" to listOf("copec"),
+            "Itaú" to listOf("itau"),
+            "Lapolar Prepago" to listOf("polar", "lapolar"),
+            "Mercado Pago" to listOf("mercado", "mercadopago", "mp"),
+            "Scotiabank" to listOf("scotia", "scotiabank"),
+            "TAPP" to listOf("tapp"),
+            "Tenpo" to listOf("tenpo")
+        )
+
+        // Procesar cada línea
+        for (line in lines) {
+            val normalizedLine = line.trim().lowercase()
+
+            // Detectar banco usando palabras clave
+            if (bankData.bank == null || bankData.bank == "No disponible") {
+                for ((bankName, keywords) in bankKeywords) {
+                    if (keywords.any { keyword -> normalizedLine.contains(keyword.lowercase()) }) {
+                        bankData.bank = bankName
+                        break
+                    }
+                }
+            }
+
+            when {
+                // Detectar RUT
+                line.matches(Regex(".*\\b\\d{1,2}[.]?\\d{3}[.]?\\d{3}-?[\\dkK]\\b.*")) -> {
+                    val rutMatch = line.replace(Regex("[^\\dkK.-]"), "").trim()
+                    bankData.rut = formatRut(rutMatch)
+                }
+
+                // Detectar tipos de cuenta
+                normalizedLine.contains("cuenta") || normalizedLine.contains("cta") -> {
+                    when {
+                        normalizedLine.contains("rut") -> {
+                            bankData.accountType = "Cuenta RUT"
+                            bankData.bank = "Banco Estado"
+                            // Si ya tenemos el RUT, usarlo como número de cuenta
+                            if (bankData.rut != null) {
+                                bankData.accountNumber = bankData.rut!!.replace(Regex("[^0-9]"), "").dropLast(1)
+                            }
+                        }
+                        normalizedLine.contains("vista") -> bankData.accountType = "Cuenta Vista"
+                        normalizedLine.contains("corriente") -> bankData.accountType = "Cuenta Corriente"
+                        normalizedLine.contains("electronica") || normalizedLine.contains("chequera") -> 
+                            bankData.accountType = "Chequera Electrónica"
+                        normalizedLine.contains("ahorro") -> bankData.accountType = "Cuenta de Ahorro"
+                    }
+                }
+
+                // Detectar número de cuenta (si no es Cuenta RUT)
+                line.matches(Regex(".*\\d{7,20}.*")) && 
+                !line.contains("rut", true) && 
+                bankData.accountType != "Cuenta RUT" -> {
+                    bankData.accountNumber = line.replace(Regex("[^0-9]"), "")
+                }
+
+                // Detectar correo electrónico
+                line.contains("@") -> {
+                    val emailMatch = line.trim().split("\\s+".toRegex())
+                        .find { it.contains("@") && it.matches(Regex(".*@.*\\.[a-zA-Z]{2,}")) }
+                    if (emailMatch != null) {
+                        bankData.email = emailMatch
+                    }
+                }
+
+                // Detectar nombre de empresa o persona (si no es una línea con datos bancarios)
+                line.length > 5 && 
+                !line.contains("@") && 
+                !line.matches(Regex(".*\\d{7,20}.*")) && 
+                !normalizedLine.contains("cuenta") && 
+                !normalizedLine.contains("banco") && 
+                bankData.companyName == null -> {
+                    bankData.companyName = line.trim()
+                }
+            }
+        }
+
+        return bankData
+    }
+
+    private fun buildFormattedText(bankData: BankData): String {
+        return buildString {
+            appendLine("Nombre: ${bankData.companyName ?: "No disponible"}")
+            appendLine("RUT: ${bankData.rut ?: "No disponible"}")
+            appendLine("Banco: ${bankData.bank ?: "No disponible"}")
+            appendLine("Tipo de Cuenta: ${bankData.accountType ?: "No disponible"}")
+            appendLine("Número de Cuenta: ${bankData.accountNumber ?: "No disponible"}")
+            appendLine("Correo: ${bankData.email ?: "No disponible"}")
+        }.trim()
     }
 
     private fun finishAndSendResults() {
@@ -203,5 +313,17 @@ class CheckInImageActivity : AppCompatActivity() {
         cardView.isVisible = !showScanFrame
         btnFinalizar.text = if (showScanFrame) "Procesar" else "Finalizar"
         isAdjustingFrame = showScanFrame
+    }
+
+    private fun formatRut(rut: String): String {
+        val cleanRut = rut.replace(Regex("[^0-9Kk]"), "").uppercase()
+        return when {
+            cleanRut.length <= 1 -> cleanRut
+            else -> {
+                val body = cleanRut.substring(0, cleanRut.length - 1)
+                val dv = cleanRut.last()
+                "${body.reversed().chunked(3).joinToString(".").reversed()}-$dv"
+            }
+        }
     }
 }

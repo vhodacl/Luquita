@@ -330,24 +330,17 @@ class ResultActivity : AppCompatActivity() {
 
         // Configuración inicial del campo
         if (key == "RUT" && value?.contains(".") != true) {
-            valueTextView.setText(formatRut(value ?: ""))
+            valueTextView.setText(if (value == "No disponible") "" else formatRut(value ?: ""))
         } else {
-            valueTextView.setText(value?.replace("\n", " "))
+            valueTextView.setText(if (value == "No disponible") "" else value?.replace("\n", " "))
         }
     }
 
     private fun formatRut(rut: String): String {
-        val cleanRut = rut.replace(Regex("[^0-9Kk]"), "")
+        val cleanRut = rut.replace(Regex("[^0-9Kk]"), "").uppercase()
         return when {
             cleanRut.length <= 1 -> cleanRut
-            cleanRut.length <= 8 -> {
-                // Para RUTs cortos (adultos mayores)
-                val body = cleanRut.substring(0, cleanRut.length - 1)
-                val dv = cleanRut.last()
-                "${body.reversed().chunked(3).joinToString(".").reversed()}-$dv"
-            }
             else -> {
-                // Para RUTs normales
                 val body = cleanRut.substring(0, cleanRut.length - 1)
                 val dv = cleanRut.last()
                 "${body.reversed().chunked(3).joinToString(".").reversed()}-$dv"
@@ -398,19 +391,23 @@ class ResultActivity : AppCompatActivity() {
                 copyToClipboard(allData)
                 showCopiedIndicator()
             }
+
+            shareCard.setOnClickListener {
+                shareData(getAllData())
+            }
         }
     }
 
     private fun getAllData(): String {
         with(binding) {
             return listOf(
-                companyNameEditText.text.toString(),
-                rutEditText.text.toString(),
-                emailEditText.text.toString(),
-                bankSpinner.selectedItem.toString(),
-                accountTypeSpinner.selectedItem.toString(),
-                accountNumberEditText.text.toString()
-            ).joinToString("\n")
+                companyNameEditText.text.toString().takeIf { it.isNotBlank() } ?: "",
+                rutEditText.text.toString().takeIf { it.isNotBlank() } ?: "",
+                emailEditText.text.toString().takeIf { it.isNotBlank() } ?: "",
+                bankSpinner.selectedItem.toString().takeIf { it != "Seleccione un banco" } ?: "",
+                accountTypeSpinner.selectedItem.toString().takeIf { it != "Seleccione tipo de cuenta" } ?: "",
+                accountNumberEditText.text.toString().takeIf { it.isNotBlank() } ?: ""
+            ).filter { it.isNotEmpty() }.joinToString("\n")
         }
     }
 
@@ -477,77 +474,113 @@ class ResultActivity : AppCompatActivity() {
             "Número de Cuenta" to "No disponible"
         )
 
-        // Separar por líneas y limpiar espacios
         val lines = detectedText.split("\n").map { it.trim() }
-        
-        // Buscar RUT primero ya que suele estar cerca del nombre
         var rutIndex = -1
+        
+        // Buscar RUT primero
         lines.forEachIndexed { index, line ->
-            if (line.matches(Regex(".*\\d{1,2}[.]\\d{3}[.]\\d{3}-[\\dkK].*"))) {
-                dataMap["RUT"] = line.replace(Regex("[^0-9Kk.-]"), "")
+            if (line.matches(Regex(".*\\d{1,2}[.]?\\d{3}[.]?\\d{3}-?[\\dkK].*"))) {
+                // Limpiar y formatear el RUT
+                val cleanRut = line.replace(Regex("[^0-9Kk]"), "").uppercase()
+                dataMap["RUT"] = formatRut(cleanRut)
                 rutIndex = index
-            }
-        }
 
-        // Buscar nombre (suele estar cerca del RUT)
-        if (rutIndex >= 0) {
-            // Buscar nombre en las líneas anteriores al RUT
-            for (i in maxOf(0, rutIndex - 2)..rutIndex) {
-                val line = lines[i]
-                if (!line.contains("rut", ignoreCase = true) && 
-                    !line.matches(Regex(".*\\d{1,2}[.]\\d{3}[.]\\d{3}-[\\dkK].*")) &&
-                    line.length > 3) {
-                    dataMap["Nombre"] = line
-                    break
+                // Si es una Cuenta RUT, usar el RUT como número de cuenta (sin DV)
+                if (line.lowercase().contains("cuenta rut") || 
+                    line.lowercase().contains("cta rut") || 
+                    dataMap["Tipo de Cuenta"] == "Cuenta RUT") {
+                    dataMap["Número de Cuenta"] = cleanRut.substring(0, cleanRut.length - 1)
+                    dataMap["Tipo de Cuenta"] = "Cuenta RUT"
+                    dataMap["Banco"] = "Banco Estado"
                 }
             }
         }
 
         // Procesar cada línea
         lines.forEach { line ->
+            val normalizedLine = line.lowercase()
             when {
+                // Detectar Cuenta RUT
+                normalizedLine.contains("cuenta rut") || 
+                normalizedLine.contains("cta rut") || 
+                normalizedLine.contains("cta.rut") || 
+                normalizedLine.contains("ctarut") -> {
+                    dataMap["Tipo de Cuenta"] = "Cuenta RUT"
+                    dataMap["Banco"] = "Banco Estado"
+                    
+                    // Si ya tenemos el RUT, usarlo como número de cuenta
+                    if (dataMap["RUT"] != "No disponible") {
+                        val rutWithoutDV = dataMap["RUT"]!!
+                            .replace(Regex("[^0-9]"), "")
+                            .dropLast(1)
+                        dataMap["Número de Cuenta"] = rutWithoutDV
+                    }
+                }
                 // Detectar banco (mejorado)
-                line.contains("banco", ignoreCase = true) || 
-                line.contains("bco", ignoreCase = true) -> {
+                normalizedLine.contains("banco", ignoreCase = true) || 
+                normalizedLine.contains("bco", ignoreCase = true) ||
+                normalizedLine.contains("mercado pago", ignoreCase = true) ||
+                normalizedLine.contains("mercadopago", ignoreCase = true) ||
+                normalizedLine.contains("mach", ignoreCase = true) ||
+                normalizedLine.contains("tenpo", ignoreCase = true) ||
+                normalizedLine.contains("coopeuch", ignoreCase = true) -> {
                     // Si encuentra "cuenta rut" o "cta rut", asignar Banco Estado
-                    if (line.contains("cuenta rut", ignoreCase = true) || 
-                        line.contains("cta rut", ignoreCase = true)) {
+                    if (normalizedLine.contains("cuenta rut", ignoreCase = true) || 
+                        normalizedLine.contains("cta rut", ignoreCase = true)) {
                         dataMap["Banco"] = "Banco Estado"
-                        dataMap["Tipo de Cuenta"] = "Cuenta Vista"
+                        dataMap["Tipo de Cuenta"] = "Cuenta RUT"
                         return@forEach
                     }
                     
-                    banksList.forEach { bankName ->
-                        if (line.contains(bankName.toLowerCase().replace("banco ", ""))) {
-                            dataMap["Banco"] = bankName
-                            return@forEach
+                    // Buscar coincidencia de banco de manera más flexible
+                    val bankMatch = banksList.find { bankName ->
+                        when {
+                            // Casos especiales
+                            bankName == "Mercado Pago" && 
+                                (normalizedLine.contains("mercado") || normalizedLine.contains("mp")) -> true
+                            bankName == "Banco BCI/MACH" && normalizedLine.contains("mach") -> true
+                            bankName == "Banco BCI" && normalizedLine.contains("bci") -> true
+                            bankName == "Banco Estado" && 
+                                (normalizedLine.contains("estado") || normalizedLine.contains("banestado")) -> true
+                            bankName == "Banco de Chile" && normalizedLine.contains("chile") -> true
+                            // Para otros bancos, buscar palabras clave
+                            else -> {
+                                val bankWords = bankName.lowercase().split(" ")
+                                bankWords.any { word ->
+                                    word.length > 2 && normalizedLine.contains(word)
+                                }
+                            }
                         }
+                    }
+                    
+                    if (bankMatch != null) {
+                        dataMap["Banco"] = bankMatch
                     }
                 }
 
                 // Detectar correo
-                line.matches(Regex(".*[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}.*")) -> {
+                normalizedLine.matches(Regex(".*[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}.*")) -> {
                     dataMap["Correo"] = line.trim()
                 }
 
                 // Detectar tipo de cuenta (mejorado)
-                line.contains("cuenta", ignoreCase = true) || 
-                line.contains("cta", ignoreCase = true) -> {
+                normalizedLine.contains("cuenta", ignoreCase = true) || 
+                normalizedLine.contains("cta", ignoreCase = true) -> {
                     // Primero verificar si es Cuenta RUT
-                    if (line.contains("cuenta rut", ignoreCase = true) || 
-                        line.contains("cta rut", ignoreCase = true)) {
+                    if (normalizedLine.contains("cuenta rut", ignoreCase = true) || 
+                        normalizedLine.contains("cta rut", ignoreCase = true)) {
                         dataMap["Tipo de Cuenta"] = "Cuenta Vista"
                         dataMap["Banco"] = "Banco Estado"
                     } else {
                         when {
-                            line.contains("ahorro", ignoreCase = true) -> 
+                            normalizedLine.contains("ahorro", ignoreCase = true) -> 
                                 dataMap["Tipo de Cuenta"] = "Cuenta de Ahorro"
-                            line.contains("corriente", ignoreCase = true) -> 
+                            normalizedLine.contains("corriente", ignoreCase = true) -> 
                                 dataMap["Tipo de Cuenta"] = "Cuenta Corriente"
-                            line.contains("vista", ignoreCase = true) -> 
+                            normalizedLine.contains("vista", ignoreCase = true) -> 
                                 dataMap["Tipo de Cuenta"] = "Cuenta Vista"
-                            line.contains("chequera", ignoreCase = true) || 
-                            line.contains("electrónica", ignoreCase = true) -> 
+                            normalizedLine.contains("chequera", ignoreCase = true) || 
+                            normalizedLine.contains("electrónica", ignoreCase = true) -> 
                                 dataMap["Tipo de Cuenta"] = "Chequera Electrónica"
                         }
                     }
@@ -563,8 +596,8 @@ class ResultActivity : AppCompatActivity() {
                 }
 
                 // Detectar número de cuenta si no se encontró antes
-                line.matches(Regex(".*\\d{7,20}.*")) &&
-                !line.contains("rut", ignoreCase = true) &&
+                normalizedLine.matches(Regex(".*\\d{7,20}.*")) &&
+                !normalizedLine.contains("rut", ignoreCase = true) &&
                 dataMap["Número de Cuenta"] == "No disponible" -> {
                     val numbers = line.replace(Regex("[^0-9]"), " ")
                         .trim()
@@ -609,7 +642,8 @@ class ResultActivity : AppCompatActivity() {
     // Funciones de validación
     private fun isValidRut(rut: String?): Boolean {
         if (rut.isNullOrBlank()) return false
-        val pattern = Regex("^\\d{1,2}\\.\\d{3}\\.\\d{3}-[\\dkK]$")
+        // Actualizado para aceptar K mayúscula o minúscula
+        val pattern = Regex("^\\d{1,2}\\.\\d{3}\\.\\d{3}-[\\dKk]$")
         return pattern.matches(rut)
     }
 
@@ -624,6 +658,24 @@ class ResultActivity : AppCompatActivity() {
         // Validar que solo contenga números y tenga entre 7 y 20 dígitos
         val pattern = Regex("^\\d{7,20}$")
         return pattern.matches(accountNumber)
+    }
+
+    private fun shareData(data: String) {
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, data)
+        }
+        
+        try {
+            startActivity(Intent.createChooser(shareIntent, "Compartir mediante"))
+        } catch (e: Exception) {
+            Snackbar.make(
+                binding.toolbar3,
+                "No se encontraron aplicaciones para compartir",
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
     }
 
     companion object {
