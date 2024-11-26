@@ -17,6 +17,16 @@
         android:background="@android:color/black"
         app:implementationMode="performance" />
 
+    <!-- Reemplaza el View overlay anterior por este -->
+    <com.vhoda.luquita.ScannerOverlayView
+        android:id="@+id/overlay_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <!-- TextView para texto reconocido -->
     <TextView
         android:id="@+id/recognizedTextView"
