@@ -217,6 +217,9 @@ class CameraActivity : AppCompatActivity() {
     private fun processImageForOCR(imageProxy: ImageProxy) {
         isProcessingImage = true
         lastProcessTime = System.currentTimeMillis()
+        
+        // Mostrar estado de escaneo
+        runOnUiThread { updateCornerState(ScanState.SCANNING) }
 
         try {
             val bitmap = imageProxy.toBitmap()
@@ -230,11 +233,14 @@ class CameraActivity : AppCompatActivity() {
                             val detectedText = visionText.text.trim()
                             if (detectedText.isNotEmpty() && detectedText != lastProcessedText) {
                                 lastProcessedText = detectedText
-
-                                // Mostrar texto detectado y activar botón de resultado
-                                binding.recognizedTextView.text = detectedText
-                                binding.recognizedTextView.visibility = View.VISIBLE
-                                binding.btnResult.visibility = View.VISIBLE
+                                runOnUiThread {
+                                    updateCornerState(ScanState.DETECTED)
+                                    binding.recognizedTextView.text = detectedText
+                                    binding.recognizedTextView.visibility = View.VISIBLE
+                                    binding.btnResult.visibility = View.VISIBLE
+                                }
+                            } else {
+                                runOnUiThread { updateCornerState(ScanState.IDLE) }
                             }
                         }
                         .addOnFailureListener { e ->
@@ -422,6 +428,36 @@ class CameraActivity : AppCompatActivity() {
         )
     }
 
+    private fun updateCornerState(state: ScanState) {
+        val (topLeft, topRight, bottomLeft, bottomRight) = when (state) {
+            ScanState.SCANNING -> listOf(
+                R.drawable.corner_top_left_scanning,
+                R.drawable.corner_top_right_scanning,
+                R.drawable.corner_bottom_left_scanning,
+                R.drawable.corner_bottom_right_scanning
+            )
+            ScanState.DETECTED -> listOf(
+                R.drawable.corner_top_left_detected,
+                R.drawable.corner_top_right_detected,
+                R.drawable.corner_bottom_left_detected,
+                R.drawable.corner_bottom_right_detected
+            )
+            ScanState.IDLE -> listOf(
+                R.drawable.corner_top_left,
+                R.drawable.corner_top_right,
+                R.drawable.corner_bottom_left,
+                R.drawable.corner_bottom_right
+            )
+        }
+        
+        binding.apply {
+            cornerTopLeft.setBackgroundResource(topLeft)
+            cornerTopRight.setBackgroundResource(topRight)
+            cornerBottomLeft.setBackgroundResource(bottomLeft)
+            cornerBottomRight.setBackgroundResource(bottomRight)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
@@ -430,4 +466,10 @@ class CameraActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "CameraActivity"
     }
+}
+
+enum class ScanState {
+    IDLE,
+    SCANNING,
+    DETECTED
 }

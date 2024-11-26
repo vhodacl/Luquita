@@ -85,8 +85,6 @@
         android:id="@+id/btnResult"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="16dp"
         android:background="@drawable/rounded_button"
         android:padding="5dp"
         android:text="Capturar Información"
@@ -94,8 +92,8 @@
         android:visibility="gone"
         android:elevation="4dp"
         app:layout_constraintBottom_toTopOf="@id/buttons_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@id/scan_frame_container"
+        app:layout_constraintStart_toStartOf="@id/scan_frame_container" />
 
     <!-- Contenedor de botones -->
     <LinearLayout
