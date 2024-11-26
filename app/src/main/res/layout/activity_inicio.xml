@@ -16,8 +16,8 @@
 
         <ImageView
             android:id="@+id/toolbar_image"
-            android:layout_width="114dp"
-            android:layout_height="60dp"
+            android:layout_width="104dp"
+            android:layout_height="40dp"
             android:contentDescription="@string/app_name"
             android:src="@drawable/luquitalogocompleto"
             android:scaleType="fitCenter"
@@ -25,8 +25,8 @@
 
         <ImageButton
             android:id="@+id/more_options"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:layout_gravity="end"
             android:layout_marginEnd="10dp"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -49,17 +49,15 @@
             android:layout_width="match_parent"
             android:layout_height="230dp"
             android:layout_marginHorizontal="26dp"
-            android:layout_marginTop="140dp"
+            android:layout_marginTop="160dp"
             app:cardCornerRadius="26dp"
             app:cardBackgroundColor="@color/md_theme_surfaceContainer"
             android:clickable="true"
             android:focusable="true">
 
-            <!-- Aquí puedes agregar el contenido que desees dentro de la tarjeta -->
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
@@ -67,9 +65,31 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
-                    android:text="Luquita está en fase Alpha, Donde algunas funciones no están pulidas y requiere Pruebas y Feedback"
                     android:textSize="14sp"/>
-            </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textCardSource"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:layout_marginEnd="8dp"
+                        android:textStyle="italic"/>
+
+                    <ImageButton
+                        android:id="@+id/btnNextFact"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/refresh"
+                        android:contentDescription="Siguiente dato curioso"/>
+                </LinearLayout>
+            </RelativeLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -82,7 +102,7 @@
             android:gravity="center"
             android:padding="16dp"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="70dp"
+            android:layout_marginBottom="65dp"
             android:spacing="16dp">
 
             <!-- Botón Galería -->
@@ -171,7 +191,6 @@
             android:layout_below="@id/buttonsContainer"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="-75dp"
-            android:background="@drawable/rounded_button"
             android:padding="12dp"
             android:text="Pegar y Normalizar"
             android:textStyle="bold"

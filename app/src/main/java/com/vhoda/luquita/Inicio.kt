@@ -15,6 +15,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.vhoda.luquita.databinding.ActivityInicioBinding  // Cambio aquí
+import com.vhoda.luquita.model.TransferFact
+import com.vhoda.luquita.model.TransferFactsProvider
 
 class Inicio : AppCompatActivity() {
     private lateinit var binding: ActivityInicioBinding  // Cambio aquí
@@ -38,6 +40,7 @@ class Inicio : AppCompatActivity() {
 
         setupTransparentBars()
         setupClickListeners()
+        showRandomFact()
     }
 
     private fun isFirstTime(): Boolean {
@@ -243,5 +246,15 @@ class Inicio : AppCompatActivity() {
         }
 
         bottomSheetDialog.show()
+    }
+
+    private fun showRandomFact() {
+        val fact = TransferFactsProvider.getRandomFact()
+        binding.textCardContent.text = fact.fact
+        binding.textCardSource.text = fact.source ?: ""
+        
+        binding.btnNextFact.setOnClickListener {
+            showRandomFact()
+        }
     }
 }
