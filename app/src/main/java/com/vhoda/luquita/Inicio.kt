@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.vhoda.luquita.databinding.ActivityInicioBinding  // Cambio aquí
+import com.vhoda.luquita.databinding.ActivityInicioBinding
 import com.vhoda.luquita.model.TransferFact
 import com.vhoda.luquita.model.TransferFactsProvider
 
