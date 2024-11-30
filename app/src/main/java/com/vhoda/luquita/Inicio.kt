@@ -249,9 +249,46 @@ class Inicio : AppCompatActivity() {
     }
 
     private fun showRandomFact() {
-        val fact = TransferFactsProvider.getRandomFact()
-        binding.textCardContent.text = fact.fact
-        binding.textCardSource.text = fact.source ?: ""
+        // Animar el botón
+        binding.btnNextFact.animate()
+            .rotation(binding.btnNextFact.rotation + 360f)
+            .setDuration(500)
+            .start()
+
+        // Ocultar textos con fade out
+        binding.textCardContent.animate().alpha(0f).setDuration(200).start()
+        binding.textCardSource.animate()
+            .alpha(0f)
+            .setDuration(200)
+            .withEndAction {
+                // Mostrar skeleton
+                binding.skeletonLayout.visibility = View.VISIBLE
+                binding.textCardContent.visibility = View.INVISIBLE
+                binding.textCardSource.visibility = View.INVISIBLE
+                
+                // Simular carga de datos
+                binding.textCardContent.postDelayed({
+                    // Obtener nuevo fact
+                    val fact = TransferFactsProvider.getRandomFact()
+                    
+                    // Ocultar skeleton
+                    binding.skeletonLayout.visibility = View.GONE
+                    
+                    // Actualizar textos
+                    binding.textCardContent.text = fact.fact
+                    binding.textCardSource.text = fact.source ?: ""
+                    
+                    // Mostrar textos con fade in
+                    binding.textCardContent.alpha = 0f
+                    binding.textCardSource.alpha = 0f
+                    binding.textCardContent.visibility = View.VISIBLE
+                    binding.textCardSource.visibility = View.VISIBLE
+                    
+                    binding.textCardContent.animate().alpha(1f).setDuration(200).start()
+                    binding.textCardSource.animate().alpha(1f).setDuration(200).start()
+                }, 1000) // 1 segundo de delay
+            }
+            .start()
         
         binding.btnNextFact.setOnClickListener {
             showRandomFact()
