@@ -496,14 +496,11 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun showCopiedIndicator() {
-        Snackbar.make(
-            binding.toolbar3, 
-            "Copiado al portapapeles", 
-            Snackbar.LENGTH_SHORT
-        ).apply {
-            setAnchorView(binding.toolbar3)
-            show()
-        }
+        Toast.makeText(
+            this,
+            "Copiado al portapapeles",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun updateValidationIcon(imageView: ImageView, isValid: Boolean) {
