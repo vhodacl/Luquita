@@ -41,6 +41,29 @@ class CheckInImageActivity : AppCompatActivity() {
 
     private var detectedText: String = ""  // Variable para almacenar el texto detectado
 
+    private val bankKeywords = mapOf(
+        "Banco Estado" to listOf("estado", "bancoestado", "banco estado"),
+        "Banco Santander" to listOf("santander"),
+        "Banco de Chile" to listOf("chile", "banco de chile", "bancochile"),
+        "Banco Falabella" to listOf("falabella"),
+        "Banco Ripley" to listOf("ripley"),
+        "Banco BCI" to listOf("bci"),
+        "Banco BICE" to listOf("bice"),
+        "Banco Corpbanca" to listOf("corpbanca", "itau", "itaú"),
+        "Banco Internacional" to listOf("internacional"),
+        "Banco Security" to listOf("security"),
+        "Consorcio" to listOf("consorcio"),
+        "Coopeuch" to listOf("coopeuch"),
+        "Mercado Pago" to listOf("mercadopago", "mercado pago", "mp"),
+        "Lapolar Prepago" to listOf("lapolar", "la polar"),
+        "Scotiabank" to listOf("scotia", "scotiabank"),
+        "Itaú" to listOf("itau", "itaú"),
+        "Tenpo" to listOf("tenpo"),
+        "TAPP" to listOf("tapp"),
+        "Copec APP" to listOf("copec"),
+        "Banco BCI/MACH" to listOf("mach")
+    )
+
     companion object {
         private const val TAG = "CheckInImageActivity"
         private const val MIN_MARGIN = 0
@@ -164,57 +187,25 @@ class CheckInImageActivity : AppCompatActivity() {
 
     private fun parseBankData(text: String): BankData {
         val bankData = BankData()
-        val lines = text.split("\n")
+        val lines = text.split("\n").map { it.trim().lowercase() }
 
-        // Mapa de palabras clave para detectar bancos (igual que en CameraActivity)
-        val bankKeywords = mapOf(
-            "Banco BCI" to listOf("bci"),
-            "Banco BCI/MACH" to listOf("mach"),
-            "Banco BICE" to listOf("bice"),
-            "Banco Corpbanca" to listOf("corpbanca", "itau"),
-            "Banco de Chile" to listOf("chile"),
-            "Banco Estado" to listOf("estado", "banestado"),
-            "Banco Falabella" to listOf("falabella"),
-            "Banco Internacional" to listOf("internacional"),
-            "Banco Ripley" to listOf("ripley"),
-            "Banco Santander" to listOf("santander"),
-            "Banco Security" to listOf("security"),
-            "Consorcio" to listOf("consorcio"),
-            "Coopeuch" to listOf("coopeuch"),
-            "Copec APP" to listOf("copec"),
-            "Itaú" to listOf("itau"),
-            "Lapolar Prepago" to listOf("polar", "lapolar"),
-            "Mercado Pago" to listOf("mercado", "mercadopago", "mp"),
-            "Scotiabank" to listOf("scotia", "scotiabank"),
-            "TAPP" to listOf("tapp"),
-            "Tenpo" to listOf("tenpo")
-        )
-
-        // Procesar cada línea
-        for (line in lines) {
-            val normalizedLine = line.trim().lowercase()
-
-            // Detectar banco usando palabras clave
-            if (bankData.bank == null || bankData.bank == "No disponible") {
-                for ((bankName, keywords) in bankKeywords) {
-                    if (keywords.any { keyword -> normalizedLine.contains(keyword.lowercase()) }) {
-                        bankData.bank = bankName
-                        break
-                    }
-                }
-            }
-
+        lines.forEach { line ->
             when {
-                // Detectar RUT
+                // Detectar RUT (prioridad alta ya que tiene formato específico)
                 line.matches(Regex(".*\\b\\d{1,2}[.]?\\d{3}[.]?\\d{3}-?[\\dkK]\\b.*")) -> {
                     val rutMatch = line.replace(Regex("[^\\dkK.-]"), "").trim()
                     bankData.rut = formatRut(rutMatch)
+                    
+                    // Si es Banco Estado y Cuenta RUT, usar el RUT como número de cuenta
+                    if (bankData.bank == "Banco Estado" && bankData.accountType == "Cuenta RUT") {
+                        bankData.accountNumber = rutMatch.replace(Regex("[^0-9]"), "").dropLast(1)
+                    }
                 }
 
-                // Detectar tipos de cuenta
-                normalizedLine.contains("cuenta") || normalizedLine.contains("cta") -> {
+                // Detectar tipo de cuenta
+                line.contains("cuenta") || line.contains("cta") -> {
                     when {
-                        normalizedLine.contains("rut") -> {
+                        line.contains("rut") -> {
                             bankData.accountType = "Cuenta RUT"
                             bankData.bank = "Banco Estado"
                             // Si ya tenemos el RUT, usarlo como número de cuenta
@@ -222,40 +213,56 @@ class CheckInImageActivity : AppCompatActivity() {
                                 bankData.accountNumber = bankData.rut!!.replace(Regex("[^0-9]"), "").dropLast(1)
                             }
                         }
-                        normalizedLine.contains("vista") -> bankData.accountType = "Cuenta Vista"
-                        normalizedLine.contains("corriente") -> bankData.accountType = "Cuenta Corriente"
-                        normalizedLine.contains("electronica") || normalizedLine.contains("chequera") -> 
+                        line.contains("vista") -> bankData.accountType = "Cuenta Vista"
+                        line.contains("corriente") -> bankData.accountType = "Cuenta Corriente"
+                        line.contains("electronica") || line.contains("chequera") -> 
                             bankData.accountType = "Chequera Electrónica"
-                        normalizedLine.contains("ahorro") -> bankData.accountType = "Cuenta de Ahorro"
+                        line.contains("ahorro") -> bankData.accountType = "Cuenta de Ahorro"
                     }
                 }
 
-                // Detectar número de cuenta (si no es Cuenta RUT)
-                line.matches(Regex(".*\\d{7,20}.*")) && 
-                !line.contains("rut", true) && 
-                bankData.accountType != "Cuenta RUT" -> {
-                    bankData.accountNumber = line.replace(Regex("[^0-9]"), "")
-                }
-
-                // Detectar correo electrónico
-                line.contains("@") -> {
-                    val emailMatch = line.trim().split("\\s+".toRegex())
-                        .find { it.contains("@") && it.matches(Regex(".*@.*\\.[a-zA-Z]{2,}")) }
-                    if (emailMatch != null) {
-                        bankData.email = emailMatch
+                // Detectar número de cuenta (números largos sin guiones)
+                line.matches(Regex(".*\\b\\d{7,20}\\b.*")) -> {
+                    // Solo usar el RUT como número de cuenta para Banco Estado y Cuenta RUT
+                    if (bankData.bank == "Banco Estado" && bankData.accountType == "Cuenta RUT") {
+                        if (bankData.rut != null) {
+                            bankData.accountNumber = bankData.rut!!.replace(Regex("[^0-9]"), "").dropLast(1)
+                        }
+                    } else {
+                        // Para todos los demás casos, usar el número detectado
+                        bankData.accountNumber = line.replace(Regex("[^0-9]"), "")
                     }
                 }
 
-                // Detectar nombre de empresa o persona (si no es una línea con datos bancarios)
+                // Detectar banco usando keywords
+                bankKeywords.any { (_, keywords) -> 
+                    keywords.any { keyword -> line.contains(keyword) }
+                } -> {
+                    bankData.bank = bankKeywords.entries.first { (_, keywords) ->
+                        keywords.any { keyword -> line.contains(keyword) }
+                    }.key
+                }
+
+                // Si la línea tiene más de 5 caracteres y no coincide con ningún otro patrón,
+                // podría ser el nombre (siempre que no contenga patrones numéricos o especiales)
                 line.length > 5 && 
-                !line.contains("@") && 
-                !line.matches(Regex(".*\\d{7,20}.*")) && 
-                !normalizedLine.contains("cuenta") && 
-                !normalizedLine.contains("banco") && 
-                bankData.companyName == null -> {
-                    bankData.companyName = line.trim()
+                !line.contains(Regex("[0-9@]")) && 
+                !line.contains("cuenta", true) && 
+                !line.contains("banco", true) && 
+                bankData.companyName.isNullOrBlank() -> {
+                    bankData.companyName = line.trim().split(" ").joinToString(" ") { 
+                        it.capitalize() 
+                    }
                 }
             }
+        }
+
+        // Verificación final para Cuenta RUT de Banco Estado
+        if (bankData.bank == "Banco Estado" && 
+            bankData.accountType == "Cuenta RUT" && 
+            bankData.accountNumber.isNullOrBlank() && 
+            bankData.rut != null) {
+            bankData.accountNumber = bankData.rut!!.replace(Regex("[^0-9]"), "").dropLast(1)
         }
 
         return bankData
@@ -263,20 +270,22 @@ class CheckInImageActivity : AppCompatActivity() {
 
     private fun buildFormattedText(bankData: BankData): String {
         return buildString {
-            appendLine("Nombre: ${bankData.companyName ?: "No disponible"}")
-            appendLine("RUT: ${bankData.rut ?: "No disponible"}")
-            appendLine("Banco: ${bankData.bank ?: "No disponible"}")
-            appendLine("Tipo de Cuenta: ${bankData.accountType ?: "No disponible"}")
-            appendLine("Número de Cuenta: ${bankData.accountNumber ?: "No disponible"}")
-            appendLine("Correo: ${bankData.email ?: "No disponible"}")
+            appendLine(bankData.companyName?.trim() ?: "No disponible")
+            appendLine(bankData.rut?.trim() ?: "No disponible")
+            appendLine(bankData.bank?.trim() ?: "No disponible")
+            appendLine(bankData.accountType?.trim() ?: "No disponible")
+            appendLine(bankData.accountNumber?.trim() ?: "No disponible")
+            appendLine(bankData.email?.trim() ?: "No disponible")
         }.trim()
     }
 
     private fun finishAndSendResults() {
-        val intent = Intent(this, ResultActivity::class.java)
-        intent.putExtra("detected_text", detectedText)
-        currentImageUri?.let {
-            intent.putExtra("image_uri", it.toString())
+        val intent = Intent(this, ResultActivity::class.java).apply {
+            putExtra(ResultActivity.EXTRA_DETECTED_TEXT, detectedText)
+            putExtra("FROM_CHECKINIMAGE", true)  // Agregar flag para indicar el origen
+            currentImageUri?.let {
+                putExtra("image_uri", it.toString())
+            }
         }
         startActivity(intent)
         finish()
@@ -325,5 +334,10 @@ class CheckInImageActivity : AppCompatActivity() {
                 "${body.reversed().chunked(3).joinToString(".").reversed()}-$dv"
             }
         }
+    }
+
+    // Función auxiliar para capitalizar strings
+    private fun String.capitalize(): String {
+        return this.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
     }
 }

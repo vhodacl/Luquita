@@ -468,146 +468,22 @@ class ResultActivity : AppCompatActivity() {
         val dataMap = mutableMapOf(
             "Nombre" to "No disponible",
             "RUT" to "No disponible",
-            "Correo" to "No disponible",
             "Banco" to "No disponible",
             "Tipo de Cuenta" to "No disponible",
-            "Número de Cuenta" to "No disponible"
+            "Número de Cuenta" to "No disponible",
+            "Correo" to "No disponible"
         )
 
+        // Dividir el texto en líneas y asignar cada línea a su campo correspondiente
         val lines = detectedText.split("\n").map { it.trim() }
-        var rutIndex = -1
-        
-        // Buscar RUT primero
-        lines.forEachIndexed { index, line ->
-            if (line.matches(Regex(".*\\d{1,2}[.]?\\d{3}[.]?\\d{3}-?[\\dkK].*"))) {
-                // Limpiar y formatear el RUT
-                val cleanRut = line.replace(Regex("[^0-9Kk]"), "").uppercase()
-                dataMap["RUT"] = formatRut(cleanRut)
-                rutIndex = index
-
-                // Si es una Cuenta RUT, usar el RUT como número de cuenta (sin DV)
-                if (line.lowercase().contains("cuenta rut") || 
-                    line.lowercase().contains("cta rut") || 
-                    dataMap["Tipo de Cuenta"] == "Cuenta RUT") {
-                    dataMap["Número de Cuenta"] = cleanRut.substring(0, cleanRut.length - 1)
-                    dataMap["Tipo de Cuenta"] = "Cuenta RUT"
-                    dataMap["Banco"] = "Banco Estado"
-                }
-            }
-        }
-
-        // Procesar cada línea
-        lines.forEach { line ->
-            val normalizedLine = line.lowercase()
-            when {
-                // Detectar Cuenta RUT
-                normalizedLine.contains("cuenta rut") || 
-                normalizedLine.contains("cta rut") || 
-                normalizedLine.contains("cta.rut") || 
-                normalizedLine.contains("ctarut") -> {
-                    dataMap["Tipo de Cuenta"] = "Cuenta RUT"
-                    dataMap["Banco"] = "Banco Estado"
-                    
-                    // Si ya tenemos el RUT, usarlo como número de cuenta
-                    if (dataMap["RUT"] != "No disponible") {
-                        val rutWithoutDV = dataMap["RUT"]!!
-                            .replace(Regex("[^0-9]"), "")
-                            .dropLast(1)
-                        dataMap["Número de Cuenta"] = rutWithoutDV
-                    }
-                }
-                // Detectar banco (mejorado)
-                normalizedLine.contains("banco", ignoreCase = true) || 
-                normalizedLine.contains("bco", ignoreCase = true) ||
-                normalizedLine.contains("mercado pago", ignoreCase = true) ||
-                normalizedLine.contains("mercadopago", ignoreCase = true) ||
-                normalizedLine.contains("mach", ignoreCase = true) ||
-                normalizedLine.contains("tenpo", ignoreCase = true) ||
-                normalizedLine.contains("coopeuch", ignoreCase = true) -> {
-                    // Si encuentra "cuenta rut" o "cta rut", asignar Banco Estado
-                    if (normalizedLine.contains("cuenta rut", ignoreCase = true) || 
-                        normalizedLine.contains("cta rut", ignoreCase = true)) {
-                        dataMap["Banco"] = "Banco Estado"
-                        dataMap["Tipo de Cuenta"] = "Cuenta RUT"
-                        return@forEach
-                    }
-                    
-                    // Buscar coincidencia de banco de manera más flexible
-                    val bankMatch = banksList.find { bankName ->
-                        when {
-                            // Casos especiales
-                            bankName == "Mercado Pago" && 
-                                (normalizedLine.contains("mercado") || normalizedLine.contains("mp")) -> true
-                            bankName == "Banco BCI/MACH" && normalizedLine.contains("mach") -> true
-                            bankName == "Banco BCI" && normalizedLine.contains("bci") -> true
-                            bankName == "Banco Estado" && 
-                                (normalizedLine.contains("estado") || normalizedLine.contains("banestado")) -> true
-                            bankName == "Banco de Chile" && normalizedLine.contains("chile") -> true
-                            // Para otros bancos, buscar palabras clave
-                            else -> {
-                                val bankWords = bankName.lowercase().split(" ")
-                                bankWords.any { word ->
-                                    word.length > 2 && normalizedLine.contains(word)
-                                }
-                            }
-                        }
-                    }
-                    
-                    if (bankMatch != null) {
-                        dataMap["Banco"] = bankMatch
-                    }
-                }
-
-                // Detectar correo
-                normalizedLine.matches(Regex(".*[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}.*")) -> {
-                    dataMap["Correo"] = line.trim()
-                }
-
-                // Detectar tipo de cuenta (mejorado)
-                normalizedLine.contains("cuenta", ignoreCase = true) || 
-                normalizedLine.contains("cta", ignoreCase = true) -> {
-                    // Primero verificar si es Cuenta RUT
-                    if (normalizedLine.contains("cuenta rut", ignoreCase = true) || 
-                        normalizedLine.contains("cta rut", ignoreCase = true)) {
-                        dataMap["Tipo de Cuenta"] = "Cuenta Vista"
-                        dataMap["Banco"] = "Banco Estado"
-                    } else {
-                        when {
-                            normalizedLine.contains("ahorro", ignoreCase = true) -> 
-                                dataMap["Tipo de Cuenta"] = "Cuenta de Ahorro"
-                            normalizedLine.contains("corriente", ignoreCase = true) -> 
-                                dataMap["Tipo de Cuenta"] = "Cuenta Corriente"
-                            normalizedLine.contains("vista", ignoreCase = true) -> 
-                                dataMap["Tipo de Cuenta"] = "Cuenta Vista"
-                            normalizedLine.contains("chequera", ignoreCase = true) || 
-                            normalizedLine.contains("electrónica", ignoreCase = true) -> 
-                                dataMap["Tipo de Cuenta"] = "Chequera Electrónica"
-                        }
-                    }
-
-                    // Buscar número de cuenta en la misma línea
-                    val numbers = line.replace(Regex("[^0-9]"), " ")
-                        .trim()
-                        .split("\\s+".toRegex())
-                        .filter { it.length >= 7 }
-                    if (numbers.isNotEmpty()) {
-                        dataMap["Número de Cuenta"] = numbers[0]
-                    }
-                }
-
-                // Detectar número de cuenta si no se encontró antes
-                normalizedLine.matches(Regex(".*\\d{7,20}.*")) &&
-                !normalizedLine.contains("rut", ignoreCase = true) &&
-                dataMap["Número de Cuenta"] == "No disponible" -> {
-                    val numbers = line.replace(Regex("[^0-9]"), " ")
-                        .trim()
-                        .split("\\s+".toRegex())
-                        .filter { it.length >= 7 }
-                    if (numbers.isNotEmpty()) {
-                        dataMap["Número de Cuenta"] = numbers[0]
-                    }
-                }
-            }
+        if (lines.size >= 6) {
+            // El texto viene en orden específico desde CheckInImageActivity
+            dataMap["Nombre"] = lines[0].takeIf { it != "No disponible" } ?: "No disponible"
+            dataMap["RUT"] = lines[1].takeIf { it != "No disponible" } ?: "No disponible"
+            dataMap["Banco"] = lines[2].takeIf { it != "No disponible" } ?: "No disponible"
+            dataMap["Tipo de Cuenta"] = lines[3].takeIf { it != "No disponible" } ?: "No disponible"
+            dataMap["Número de Cuenta"] = lines[4].takeIf { it != "No disponible" } ?: "No disponible"
+            dataMap["Correo"] = lines[5].takeIf { it != "No disponible" } ?: "No disponible"
         }
 
         return dataMap

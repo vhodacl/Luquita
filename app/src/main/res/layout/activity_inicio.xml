@@ -123,6 +123,7 @@
                         android:layout_alignParentEnd="true"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:src="@drawable/refresh"
+                        android:textColor="@color/md_theme_onBackground_mediumContrast"
                         android:contentDescription="Siguiente dato curioso"/>
                 </RelativeLayout>
 
