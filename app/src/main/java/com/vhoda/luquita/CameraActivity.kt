@@ -28,6 +28,11 @@ import java.io.ByteArrayOutputStream
 import android.graphics.YuvImage
 import android.graphics.ImageFormat
 import kotlin.math.roundToInt
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.content.Context
+import android.os.Build
 
 data class BankData(
     var companyName: String? = null,
@@ -75,6 +80,7 @@ class CameraActivity : AppCompatActivity() {
     private val CAMERA_PERMISSION_REQUEST_CODE = 1001
     private val PROCESS_INTERVAL = 1000L
     private var isTextDetected = false
+    private lateinit var vibrator: Vibrator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,6 +108,14 @@ class CameraActivity : AppCompatActivity() {
 
         setupUI()
         checkCameraPermission()
+
+        vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(VIBRATOR_SERVICE) as Vibrator
+        }
     }
 
     private fun initializeScanRegion() {
@@ -448,18 +462,26 @@ class CameraActivity : AppCompatActivity() {
 
     private fun updateCornerState(state: ScanState) {
         val (topLeft, topRight, bottomLeft, bottomRight) = when (state) {
-            ScanState.SCANNING -> listOf(
-                R.drawable.corner_top_left_scanning,
-                R.drawable.corner_top_right_scanning,
-                R.drawable.corner_bottom_left_scanning,
-                R.drawable.corner_bottom_right_scanning
-            )
-            ScanState.DETECTED -> listOf(
-                R.drawable.corner_top_left_detected,
-                R.drawable.corner_top_right_detected,
-                R.drawable.corner_bottom_left_detected,
-                R.drawable.corner_bottom_right_detected
-            )
+            ScanState.SCANNING -> {
+                // Vibración extremadamente suave para el escaneo (5ms)
+                vibrator.vibrate(VibrationEffect.createOneShot(5, 1))
+                listOf(
+                    R.drawable.corner_top_left_scanning,
+                    R.drawable.corner_top_right_scanning,
+                    R.drawable.corner_bottom_left_scanning,
+                    R.drawable.corner_bottom_right_scanning
+                )
+            }
+            ScanState.DETECTED -> {
+                // Vibración suave para la detección (50ms)
+                vibrator.vibrate(VibrationEffect.createOneShot(50, 2))
+                listOf(
+                    R.drawable.corner_top_left_detected,
+                    R.drawable.corner_top_right_detected,
+                    R.drawable.corner_bottom_left_detected,
+                    R.drawable.corner_bottom_right_detected
+                )
+            }
             ScanState.IDLE -> listOf(
                 R.drawable.corner_top_left,
                 R.drawable.corner_top_right,
