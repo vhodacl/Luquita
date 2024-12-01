@@ -33,8 +33,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="36dp"
-        android:background="#80000000"
-        android:padding="8dp"
+        android:background="@drawable/rounded_background"
         android:layout_marginTop="50dp"
         android:text="Texto reconocido"
         android:textColor="@android:color/white"
@@ -90,12 +89,26 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Mensaje de escaneo -->
+    <TextView
+        android:id="@+id/tvScanMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_background"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/scan_frame_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <!-- Botón de Resultado -->
     <Button
         android:id="@+id/btnResult"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_button"
+        app:cardBackgroundColor="@color/md_theme_tertiary"
         android:padding="5dp"
         android:text="Capturar Información"
         android:textColor="@android:color/white"
@@ -111,8 +124,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="52dp"
-        android:paddingVertical="52dp"
+        android:paddingHorizontal="30dp"
+        android:paddingVertical="92dp"
         android:gravity="center"
         android:weightSum="1"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -124,7 +137,7 @@
             android:layout_weight="0.4">
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btn_flash"
-                android:layout_width="60dp"
+                android:layout_width="90dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
                 app:cardCornerRadius="40dp"
@@ -160,7 +173,7 @@
             android:layout_weight="0.4">
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btn_cancel"
-                android:layout_width="60dp"
+                android:layout_width="90dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
                 app:cardCornerRadius="40dp"

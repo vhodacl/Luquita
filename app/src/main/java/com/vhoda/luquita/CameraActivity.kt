@@ -81,6 +81,7 @@ class CameraActivity : AppCompatActivity() {
     private val PROCESS_INTERVAL = 1000L
     private var isTextDetected = false
     private lateinit var vibrator: Vibrator
+    private var hasShownInitialMessage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -463,7 +464,13 @@ class CameraActivity : AppCompatActivity() {
     private fun updateCornerState(state: ScanState) {
         val (topLeft, topRight, bottomLeft, bottomRight) = when (state) {
             ScanState.SCANNING -> {
-                // Vibración extremadamente suave para el escaneo (5ms)
+                // Mostrar mensaje inicial solo una vez durante el escaneo
+                if (!hasShownInitialMessage) {
+                    binding.tvScanMessage.visibility = View.VISIBLE
+                    binding.tvScanMessage.text = "Coloque los datos de cuenta en el marco"
+                    hasShownInitialMessage = true
+                }
+                
                 vibrator.vibrate(VibrationEffect.createOneShot(5, 1))
                 listOf(
                     R.drawable.corner_top_left_scanning,
@@ -473,8 +480,10 @@ class CameraActivity : AppCompatActivity() {
                 )
             }
             ScanState.DETECTED -> {
-                // Vibración suave para la detección (50ms)
-                vibrator.vibrate(VibrationEffect.createOneShot(50, 2))
+                // Ocultar mensaje cuando se detecta texto
+                binding.tvScanMessage.visibility = View.GONE
+                
+                vibrator.vibrate(VibrationEffect.createOneShot(35, 2))
                 listOf(
                     R.drawable.corner_top_left_detected,
                     R.drawable.corner_top_right_detected,
