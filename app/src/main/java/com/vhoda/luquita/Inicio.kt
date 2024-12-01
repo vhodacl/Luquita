@@ -91,7 +91,7 @@ class Inicio : AppCompatActivity() {
                     }
                     startActivity(intent)
                 } else {
-                    Toast.makeText(this, "No hay texto en el portapapeles", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "El último texto copiado en portapapeles está normalizado.", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 Toast.makeText(this, "El portapapeles está vacío", Toast.LENGTH_SHORT).show()
@@ -239,7 +239,7 @@ class Inicio : AppCompatActivity() {
 
         // Configurar click listeners para las opciones
         bottomSheetView.findViewById<LinearLayout>(R.id.how_it_works).setOnClickListener {
-            // TODO: Implementar acción para "¿Cómo funciona?"
+            startActivity(Intent(this, HowItWorksActivity::class.java))
             bottomSheetDialog.dismiss()
         }
 

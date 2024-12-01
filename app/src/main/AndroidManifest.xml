@@ -57,5 +57,11 @@
             android:name=".PasteNormalizeActivity"
             android:exported="false"
             android:theme="@style/Theme.Luquita"/>
+
+        <!-- HowItWorksActivity -->
+        <activity
+            android:name=".HowItWorksActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Luquita" />
     </application>
 </manifest>

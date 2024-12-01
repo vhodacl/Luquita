@@ -91,7 +91,6 @@ class PasteNormalizeActivity : AppCompatActivity() {
             detectedText = buildFormattedText(bankData)
 
             binding.tvDetectedText.text = detectedText
-            binding.tvCheckinMessage.visibility = View.VISIBLE
             binding.progressBar.visibility = View.GONE
         } ?: run {
             Toast.makeText(this, "No se recibió texto", Toast.LENGTH_SHORT).show()

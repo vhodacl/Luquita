@@ -44,6 +44,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar3"
+        app:strokeWidth="1dp"
         app:layout_constraintVertical_bias="0.5">
 
         <!-- Contenedor de los campos y valores -->
@@ -245,15 +246,15 @@
 
         <!-- Botón Compartir -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/shareCard"
-            android:layout_width="0dp"
+        android:id="@+id/shareCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
         app:cardCornerRadius="18dp"
         app:cardElevation="0dp"
         android:clickable="true"
         android:focusable="true"
-            app:cardBackgroundColor="@color/md_theme_surfaceContainer"
+        app:cardBackgroundColor="@color/md_theme_surfaceContainer"
         app:strokeWidth="1dp"
         android:layout_weight="1">
 
