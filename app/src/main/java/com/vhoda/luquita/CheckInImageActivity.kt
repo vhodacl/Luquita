@@ -47,7 +47,7 @@ class CheckInImageActivity : AppCompatActivity() {
         "Banco de Chile" to listOf("chile", "banco de chile", "bancochile"),
         "Banco Falabella" to listOf("falabella"),
         "Banco Ripley" to listOf("ripley"),
-        "Banco BCI" to listOf("bci"),
+        "BCI" to listOf("bci"),
         "Banco BICE" to listOf("bice"),
         "Banco Corpbanca" to listOf("corpbanca", "itau", "itaú"),
         "Banco Internacional" to listOf("internacional"),
@@ -61,7 +61,7 @@ class CheckInImageActivity : AppCompatActivity() {
         "Tenpo" to listOf("tenpo"),
         "TAPP" to listOf("tapp"),
         "Copec APP" to listOf("copec"),
-        "Banco BCI/MACH" to listOf("mach")
+        "BCI/MACH" to listOf("mach")
     )
 
     companion object {

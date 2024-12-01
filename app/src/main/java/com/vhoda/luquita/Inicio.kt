@@ -17,6 +17,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.vhoda.luquita.databinding.ActivityInicioBinding
 import com.vhoda.luquita.model.TransferFact
 import com.vhoda.luquita.model.TransferFactsProvider
+import android.content.ClipboardManager
+import android.content.Context
 
 class Inicio : AppCompatActivity() {
     private lateinit var binding: ActivityInicioBinding  // Cambio aquí
@@ -76,6 +78,24 @@ class Inicio : AppCompatActivity() {
 
         binding.moreOptions.setOnClickListener {
             showBottomSheet()
+        }
+
+        binding.pasteButton.setOnClickListener {
+            val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            if (clipboardManager.hasPrimaryClip()) {
+                val clipData = clipboardManager.primaryClip
+                val text = clipData?.getItemAt(0)?.text?.toString()
+                if (!text.isNullOrEmpty()) {
+                    val intent = Intent(this, PasteNormalizeActivity::class.java).apply {
+                        putExtra("clipboard_text", text)
+                    }
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this, "No hay texto en el portapapeles", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "El portapapeles está vacío", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -286,7 +306,7 @@ class Inicio : AppCompatActivity() {
                     
                     binding.textCardContent.animate().alpha(1f).setDuration(200).start()
                     binding.textCardSource.animate().alpha(1f).setDuration(200).start()
-                }, 1000) // 1 segundo de delay
+                }, 500) // 1 segundo de delay
             }
             .start()
         

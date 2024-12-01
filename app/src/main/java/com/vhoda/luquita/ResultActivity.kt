@@ -31,8 +31,8 @@ class ResultActivity : AppCompatActivity() {
     // Lista completa de bancos disponibles
     private val banksList = listOf(
         "Seleccione un banco",
-        "Banco BCI",
-        "Banco BCI/MACH",
+        "BCI",
+        "BCI/MACH",
         "Banco BICE",
         "Banco Corpbanca",
         "Banco de Chile",
@@ -69,7 +69,7 @@ class ResultActivity : AppCompatActivity() {
         "Banco de Chile" to R.drawable.bancochile,
         "Banco Falabella" to R.drawable.bancofalabella,
         "Banco Ripley" to R.drawable.bancoripley,
-        "Banco BCI" to R.drawable.bci,
+        "BCI" to R.drawable.bci,
         "Banco BICE" to R.drawable.bancobice,
         "Banco Corpbanca" to R.drawable.bancocorpbanca,
         "Banco Internacional" to R.drawable.bancointernacional,

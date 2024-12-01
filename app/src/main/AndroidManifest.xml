@@ -51,5 +51,11 @@
         <activity
             android:name=".Inicio"
             android:exported="false"/>
+
+        <!-- PasteNormalizeActivity -->
+        <activity
+            android:name=".PasteNormalizeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Luquita"/>
     </application>
 </manifest>
