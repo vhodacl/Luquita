@@ -58,7 +58,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:cardCornerRadius="26dp"
+                app:cardCornerRadius="20dp"
                 app:cardBackgroundColor="@color/md_theme_surfaceContainer"
                 android:clickable="true"
                 android:focusable="true">
@@ -66,7 +66,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="12dp">
+                    android:padding="18dp">
 
                     <!-- Skeleton Layout -->
                     <LinearLayout
@@ -75,30 +75,30 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical"
                         android:visibility="gone">
-                        
+
                         <!-- Skeleton para el contenido principal -->
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="16dp"
-                            android:layout_marginBottom="8dp"
-                            android:background="@color/md_theme_surfaceVariant"/>
-                            
+                            android:layout_marginBottom="12dp"
+                            android:background="@color/md_theme_surfaceVariant" />
+
                         <View
                             android:layout_width="200dp"
                             android:layout_height="16dp"
-                            android:background="@color/md_theme_surfaceVariant"/>
-                            
+                            android:background="@color/md_theme_surfaceVariant" />
+
                         <Space
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
-                            android:layout_weight="1"/>
-                            
+                            android:layout_weight="1" />
+
                         <!-- Skeleton para el source -->
                         <View
                             android:layout_width="150dp"
                             android:layout_height="12dp"
-                            android:background="@color/md_theme_surfaceVariant"
-                            android:layout_gravity="start"/>
+                            android:layout_gravity="start"
+                            android:background="@color/md_theme_surfaceVariant" />
                     </LinearLayout>
 
                     <TextView

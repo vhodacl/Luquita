@@ -31,7 +31,7 @@ class ScannerOverlayView @JvmOverloads constructor(
 
         // Calcula las dimensiones basadas en el scan_frame_container
         val margin = 25 * resources.displayMetrics.density
-        val cornerSize = 30 * resources.displayMetrics.density
+        val cornerSize = 17 * resources.displayMetrics.density
 
         // Calcula el alto basado en la relación de aspecto 4:3
         val availableWidth = width - (2 * margin)
