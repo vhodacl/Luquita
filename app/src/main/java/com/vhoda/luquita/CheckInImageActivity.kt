@@ -189,8 +189,16 @@ class CheckInImageActivity : AppCompatActivity() {
         val bankData = BankData()
         val lines = text.split("\n").map { it.trim().lowercase() }
 
+        // Regex para detectar correos electrónicos
+        val emailRegex = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
+
         lines.forEach { line ->
             when {
+                // Agregar detección de correo electrónico
+                line.contains("@") && emailRegex.find(line) != null -> {
+                    bankData.email = emailRegex.find(line)?.value
+                }
+
                 // Detectar RUT (prioridad alta ya que tiene formato específico)
                 line.matches(Regex(".*\\b\\d{1,2}[.]?\\d{3}[.]?\\d{3}-?[\\dkK]\\b.*")) -> {
                     val rutMatch = line.replace(Regex("[^\\dkK.-]"), "").trim()
