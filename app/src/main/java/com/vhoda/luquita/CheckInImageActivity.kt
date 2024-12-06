@@ -218,8 +218,13 @@ class CheckInImageActivity : AppCompatActivity() {
         lines.forEach { line ->
             val lowerLine = line.lowercase()
             
+            // Detectar banco y tipo de cuenta especial (Cuenta RUT)
+            if (lowerLine.contains("cta rut") || lowerLine.contains("cuenta rut")) {
+                bankData.bank = "Banco Estado"
+                bankData.accountType = "Cuenta RUT"
+            } 
             // Detectar banco explícito
-            if (lowerLine.contains("banco")) {
+            else if (lowerLine.contains("banco")) {
                 when {
                     lowerLine.contains("estado") -> bankData.bank = "Banco Estado"
                     lowerLine.contains("santander") -> bankData.bank = "Banco Santander"
@@ -228,19 +233,36 @@ class CheckInImageActivity : AppCompatActivity() {
                     lowerLine.contains("ripley") -> bankData.bank = "Banco Ripley"
                     lowerLine.contains("bci") -> bankData.bank = "BCI"
                     lowerLine.contains("bice") -> bankData.bank = "Banco BICE"
-                    lowerLine.contains("itau") -> bankData.bank = "Banco Itaú"
+                    lowerLine.contains("corpbanca") -> bankData.bank = "Banco Corpbanca"
+                    lowerLine.contains("internacional") -> bankData.bank = "Banco Internacional"
+                    lowerLine.contains("security") -> bankData.bank = "Banco Security"
                 }
             }
             
-            // Detectar tipo de cuenta
-            if (lowerLine.contains("cuenta") || lowerLine.contains("cta")) {
+            // Detectar tipo de cuenta (solo si no es Cuenta RUT)
+            if (bankData.accountType != "Cuenta RUT" && 
+                (lowerLine.contains("cuenta") || lowerLine.contains("cta"))) {
                 when {
-                    lowerLine.contains("rut") -> {
-                        bankData.accountType = "Cuenta RUT"
-                        bankData.bank = "Banco Estado"
-                    }
                     lowerLine.contains("corriente") -> bankData.accountType = "Cuenta Corriente"
                     lowerLine.contains("vista") -> bankData.accountType = "Cuenta Vista"
+                    lowerLine.contains("ahorro") -> bankData.accountType = "Cuenta Ahorro"
+                }
+            }
+            
+            // Detectar otros servicios financieros (solo si no se ha detectado un banco)
+            if (bankData.bank == null) {
+                val words = line.split(" ")
+                when {
+                    words.any { it.equals("consorcio", ignoreCase = true) } -> bankData.bank = "Consorcio"
+                    words.any { it.equals("coopeuch", ignoreCase = true) } -> bankData.bank = "Coopeuch"
+                    words.any { it.equals("scotia", ignoreCase = true) } -> bankData.bank = "Scotiabank"
+                    words.any { it.equals("itau", ignoreCase = true) || it.equals("itaú", ignoreCase = true) } -> bankData.bank = "Itaú"
+                    words.any { it.equals("tenpo", ignoreCase = true) } -> bankData.bank = "Tenpo"
+                    words.any { it.equals("tapp", ignoreCase = true) } -> bankData.bank = "TAPP"
+                    words.any { it.equals("copec", ignoreCase = true) } -> bankData.bank = "Copec APP"
+                    words.any { it.equals("mach", ignoreCase = true) } -> bankData.bank = "BCI/MACH"
+                    lowerLine == "mercado pago" || lowerLine == "mercadopago" -> bankData.bank = "Mercado Pago"
+                    lowerLine == "la polar" || lowerLine == "lapolar" -> bankData.bank = "Lapolar Prepago"
                 }
             }
         }
@@ -289,19 +311,8 @@ class CheckInImageActivity : AppCompatActivity() {
                         !lowerLine.contains("banco") && // Verificaciones adicionales
                         bankData.companyName.isNullOrBlank()) {
                         
-                        // Filtrar palabras individuales y capitalizar
-                        val validName = words
-                            .filter { word -> 
-                                word.length >= 2 && // Evitar iniciales o caracteres sueltos
-                                !excludeWords.contains(word.lowercase()) &&
-                                !word.matches(Regex(".*\\d+.*")) // Sin números
-                            }
-                            .joinToString(" ") { word ->
-                                word.capitalize()
-                            }
-                        
-                        if (validName.split(" ").size >= 2) { // Asegurar que aún tenemos nombre y apellido
-                            bankData.companyName = validName
+                        bankData.companyName = words.joinToString(" ") { word ->
+                            word.capitalize()
                         }
                     }
                 }
