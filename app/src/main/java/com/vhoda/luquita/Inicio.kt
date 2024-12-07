@@ -6,7 +6,10 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -19,6 +22,10 @@ import com.vhoda.luquita.model.TransferFact
 import com.vhoda.luquita.model.TransferFactsProvider
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.view.GestureDetector
+import com.google.android.material.card.MaterialCardView
 
 class Inicio : AppCompatActivity() {
     private lateinit var binding: ActivityInicioBinding  // Cambio aquí
@@ -29,6 +36,7 @@ class Inicio : AppCompatActivity() {
         arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
     private val REQUEST_CODE = 123
+    private lateinit var cardSimple: MaterialCardView
 
     companion object {
         private const val TAG = "Inicio"
@@ -40,9 +48,11 @@ class Inicio : AppCompatActivity() {
         binding = ActivityInicioBinding.inflate(layoutInflater)  // Cambio aquí
         setContentView(binding.root)
 
+        cardSimple = binding.cardSimple
         setupTransparentBars()
         setupClickListeners()
         showRandomFact()
+        setupEasterEgg()
     }
 
     private fun isFirstTime(): Boolean {
@@ -312,6 +322,41 @@ class Inicio : AppCompatActivity() {
         
         binding.btnNextFact.setOnClickListener {
             showRandomFact()
+        }
+    }
+
+    private fun setupEasterEgg() {
+        val gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onLongPress(e: MotionEvent) {
+                // Iniciar la vibración en diferentes intervalos
+                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+                // Patrón de vibración: [inicio, duración de vibración, pausa, duración de vibración, pausa, duración de vibración]
+                val pattern = longArrayOf(0, 100, 200, 200, 300) // 5 elementos
+                val amplitudes = intArrayOf(0, 5, 15, 20, 0) // 5 elementos
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val vibrationEffect = VibrationEffect.createWaveform(pattern, amplitudes, -1)
+                    vibrator.vibrate(vibrationEffect)
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(pattern, -1)
+                }
+
+                // Mostrar un Toast con el mensaje "Mantenga sostenido..."
+                Toast.makeText(this@Inicio, "Mantenga sostenido...", Toast.LENGTH_SHORT).show()
+
+                // Iniciar la nueva actividad después de 3 segundos
+                cardSimple.postDelayed({
+                    val intent = Intent(this@Inicio, EasterEggActivity::class.java)
+                    startActivity(intent)
+                }, 3000) // Mantener el tiempo de espera para iniciar la actividad
+            }
+        })
+
+        cardSimple.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            false
         }
     }
 }

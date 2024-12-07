@@ -52,6 +52,8 @@
             android:name=".Inicio"
             android:exported="false"/>
 
+            <!-- easteregg -->
+        <activity android:name=".EasterEggActivity" />
         <!-- PasteNormalizeActivity -->
         <activity
             android:name=".PasteNormalizeActivity"
