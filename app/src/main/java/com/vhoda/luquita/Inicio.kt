@@ -344,7 +344,7 @@ class Inicio : AppCompatActivity() {
                 }
 
                 // Mostrar un Toast con el mensaje "Mantenga sostenido..."
-                Toast.makeText(this@Inicio, "Mantenga sostenido...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@Inicio, "Mantenga precionado...", Toast.LENGTH_SHORT).show()
 
                 // Iniciar la nueva actividad después de 3 segundos
                 cardSimple.postDelayed({
