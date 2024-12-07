@@ -24,9 +24,11 @@ import android.text.TextWatcher
 import com.vhoda.luquita.Inicio
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.media.MediaPlayer
 
 class ResultActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResultBinding
+    private var mediaPlayer: MediaPlayer? = null
 
     // Lista completa de bancos disponibles
     private val banksList = listOf(
@@ -132,6 +134,9 @@ class ResultActivity : AppCompatActivity() {
         setupUI(dataMap)
         setupSpinners(dataMap)
         setupInputBehavior()
+
+        // Reproducir sonido al llegar a ResultActivity
+        playSound()
     }
 
     private fun setupInputBehavior() {
@@ -554,6 +559,19 @@ class ResultActivity : AppCompatActivity() {
                 Snackbar.LENGTH_SHORT
             ).show()
         }
+    }
+
+    private fun playSound() {
+        // Inicializar el MediaPlayer con el archivo de sonido
+        mediaPlayer = MediaPlayer.create(this, R.raw.success) // Cambia "sound" por el nombre de tu archivo
+        mediaPlayer?.start() // Iniciar la reproducción
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Liberar recursos del MediaPlayer
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 
     companion object {
