@@ -17,9 +17,9 @@
         <ImageView
             android:id="@+id/toolbar_image"
             android:layout_width="104dp"
-            android:layout_height="40dp"
+            android:layout_height="50dp"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/luquitalogocompleto"
+            android:src="@drawable/luquitaloguitoapp"
             android:scaleType="fitCenter"
             android:layout_gravity="center"/>
 

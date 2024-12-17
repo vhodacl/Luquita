@@ -24,7 +24,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/app_name"
             android:scaleType="fitCenter"
-            android:src="@drawable/luquitalogocompleto" />
+            android:src="@drawable/luquitaloguitoapp" />
     </com.google.android.material.appbar.MaterialToolbar>
 
     <ScrollView
