@@ -162,9 +162,6 @@ class CheckInImageActivity : AppCompatActivity() {
                     val tvCheckinMessage = findViewById<TextView>(R.id.tv_checkin_message)
                     tvCheckinMessage.visibility = View.VISIBLE
 
-                    val ivProcessedImage = findViewById<ImageView>(R.id.iv_processed_image)
-                    ivProcessedImage.setImageBitmap(bitmap)
-
                     toggleScanMode(false)
                 }
                 .addOnFailureListener { e ->

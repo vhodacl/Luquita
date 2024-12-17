@@ -137,8 +137,8 @@
             android:layout_weight="0.4">
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btn_flash"
-                android:layout_width="90dp"
-                android:layout_height="60dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:layout_gravity="center"
                 app:cardCornerRadius="40dp"
                 app:cardElevation="0dp"
@@ -146,7 +146,8 @@
                 android:focusable="true"
                 app:cardBackgroundColor="#80FFFFFF"
                 app:strokeWidth="1dp"
-                app:strokeColor="#ebe9e7">
+                app:strokeColor="#ebe9e7"
+                android:stateListAnimator="@null">
 
                 <ImageView
                     android:id="@+id/btnFlashIcon"
@@ -156,7 +157,7 @@
                     android:scaleType="fitCenter"
                     android:contentDescription="Flash"
                     android:layout_gravity="center"
-                    android:tint="#fbf9f7" />
+                    app:tint="#fbf9f7" />
             </com.google.android.material.card.MaterialCardView>
         </FrameLayout>
 
@@ -173,8 +174,8 @@
             android:layout_weight="0.4">
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btn_cancel"
-                android:layout_width="90dp"
-                android:layout_height="60dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:layout_gravity="center"
                 app:cardCornerRadius="40dp"
                 app:cardElevation="0dp"
@@ -182,7 +183,8 @@
                 android:focusable="true"
                 app:cardBackgroundColor="#80FFFFFF"
                 app:strokeWidth="1dp"
-                app:strokeColor="#ebe9e7">
+                app:strokeColor="#ebe9e7"
+                android:stateListAnimator="@null">
 
                 <ImageView
                     android:id="@+id/btn_cancel_icon"
@@ -192,7 +194,7 @@
                     android:scaleType="fitCenter"
                     android:contentDescription="Cerrar"
                     android:layout_gravity="center"
-                    android:tint="#fbf9f7" />
+                    app:tint="#fbf9f7" />
             </com.google.android.material.card.MaterialCardView>
         </FrameLayout>
     </LinearLayout>

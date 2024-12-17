@@ -33,6 +33,8 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.content.Context
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 
 data class BankData(
     var companyName: String? = null,
@@ -138,7 +140,14 @@ class CameraActivity : AppCompatActivity() {
     private fun setupUI() {
         binding.apply {
             btnFlash.setOnClickListener { toggleFlash() }
-            btnCancel.setOnClickListener { finish() }
+            btnCancel.setOnClickListener { 
+                btnCancel.setCardBackgroundColor(ContextCompat.getColor(this@CameraActivity, R.color.md_theme_error))
+                btnCancel.strokeColor = ContextCompat.getColor(this@CameraActivity, R.color.md_theme_error)
+                btnCancelIcon.setColorFilter(Color.WHITE)
+                Handler(Looper.getMainLooper()).postDelayed({
+                    finish()
+                }, 100)
+            }
             btnResult.setOnClickListener {
                 val detectedText = recognizedTextView.text.toString()
                 if (detectedText.isNotEmpty()) {
@@ -453,6 +462,19 @@ class CameraActivity : AppCompatActivity() {
 
     private fun toggleFlash() {
         camera?.cameraControl?.enableTorch(!isFlashOn)
+        binding.btnFlash.apply {
+            if (!isFlashOn) {
+                // Cuando se enciende la linterna
+                setCardBackgroundColor(ContextCompat.getColor(context, R.color.md_theme_primary))
+                strokeColor = ContextCompat.getColor(context, R.color.md_theme_primary)
+                binding.btnFlashIcon.setImageResource(R.drawable.flashlight)  // ícono sin tachar
+            } else {
+                // Cuando se apaga la linterna
+                setCardBackgroundColor(Color.parseColor("#80FFFFFF"))
+                strokeColor = Color.parseColor("#ebe9e7")
+                binding.btnFlashIcon.setImageResource(R.drawable.flashlight_off)  // ícono tachado
+            }
+        }
     }
 
     private fun updateFlashIcon() {
@@ -466,8 +488,25 @@ class CameraActivity : AppCompatActivity() {
             ScanState.SCANNING -> {
                 // Mostrar mensaje inicial solo una vez durante el escaneo
                 if (!hasShownInitialMessage) {
-                    binding.tvScanMessage.visibility = View.VISIBLE
-                    binding.tvScanMessage.text = "Coloque los datos de cuenta en el marco"
+                    binding.tvScanMessage.apply {
+                        visibility = View.VISIBLE
+                        text = "Coloque los datos de cuenta en el marco"
+                        alpha = 0f
+                        animate()
+                            .alpha(1f)
+                            .setDuration(500)
+                            .withEndAction {
+                                // Después de 3 segundos, hacer fade out
+                                postDelayed({
+                                    animate()
+                                        .alpha(0f)
+                                        .setDuration(500)
+                                        .withEndAction {
+                                            visibility = View.GONE
+                                        }
+                                }, 3000)
+                            }
+                    }
                     hasShownInitialMessage = true
                 }
                 
