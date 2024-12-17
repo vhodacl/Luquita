@@ -26,7 +26,7 @@
         <ImageView
             android:id="@+id/toolbar_image"
             android:layout_width="114dp"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:layout_gravity="center"
             android:contentDescription="@string/app_name"
             android:scaleType="fitCenter"
