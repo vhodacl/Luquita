@@ -1,12 +1,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Camera: Used exclusively for local document capture and processing, with no data transmission -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+    <!-- Storage: Required for saving processed documents locally -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    
+    <!-- Media Images: Required for Android 13+ to access processed documents -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- Flashlight: Used to improve image capture in low light conditions -->
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+    <!-- Vibration: Used for user feedback during document capture -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
-    <!-- La cámara no es un requerimiento obligatorio -->
+    <!-- Camera hardware is optional as some devices might use image import only -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
@@ -15,6 +24,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="Luquita"
         android:theme="@style/AppTheme">
+
+        <!-- Add metadata here for permission explanation -->
+        <meta-data
+            android:name="com.google.android.gms.permission.REASON"
+            android:value="Camera is used exclusively for local document capture and processing, with no data transmission" />
 
         <!-- Actividad principal (MainActivity) -->
         <activity

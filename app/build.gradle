@@ -21,10 +21,10 @@ android {
 
     defaultConfig {
         applicationId "com.vhoda.luquita"
-        minSdkVersion 23
+        minSdkVersion 26
         targetSdk 34
-        versionCode 6
-        versionName "1.5"
+        versionCode 8
+        versionName "1.5.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
